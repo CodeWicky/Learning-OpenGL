@@ -26,11 +26,6 @@ int main(int argc, const char * argv[]) {
     
     glfwMakeContextCurrent(window);
     
-//    cout << "OpenGL Vendor:" << glGetString(GL_VENDOR) << endl;
-//    cout << "OpenGL Renderer: " << glGetString(GL_RENDERER) << endl;
-//    cout << "OpenGL Version: " << glGetString(GL_VERSION) << endl;
-//    cout << "GLSL Version:" << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-    
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
