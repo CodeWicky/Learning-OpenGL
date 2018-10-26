@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9BFCC7BB2181AE5B00B99AE3 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BFCC7BA2181AE5B00B99AE3 /* main.mm */; };
+		9BFCC7BB2181AE5B00B99AE3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BFCC7BA2181AE5B00B99AE3 /* main.cpp */; };
 		9BFCC7C42181AEEE00B99AE3 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFCC7C32181AEEE00B99AE3 /* libglfw3.a */; };
 		9BFCC7CD2181AEF900B99AE3 /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 9BFCC7C82181AEF900B99AE3 /* glad.c */; };
 		9BFCC7D02181B04200B99AE3 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFCC7CF2181B04200B99AE3 /* IOKit.framework */; };
@@ -30,7 +30,7 @@
 
 /* Begin PBXFileReference section */
 		9BFCC7B72181AE5B00B99AE3 /* OpenGL_Template */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenGL_Template; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BFCC7BA2181AE5B00B99AE3 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		9BFCC7BA2181AE5B00B99AE3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		9BFCC7C32181AEEE00B99AE3 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw3.a; sourceTree = "<group>"; };
 		9BFCC7C62181AEF900B99AE3 /* glfw3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3.h; sourceTree = "<group>"; };
 		9BFCC7C72181AEF900B99AE3 /* glfw3native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3native.h; sourceTree = "<group>"; };
@@ -81,7 +81,7 @@
 			children = (
 				9BFCC7C22181AEC800B99AE3 /* lib */,
 				9BFCC7C12181AEC000B99AE3 /* include */,
-				9BFCC7BA2181AE5B00B99AE3 /* main.mm */,
+				9BFCC7BA2181AE5B00B99AE3 /* main.cpp */,
 			);
 			path = OpenGL_Template;
 			sourceTree = "<group>";
@@ -197,7 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BFCC7BB2181AE5B00B99AE3 /* main.mm in Sources */,
+				9BFCC7BB2181AE5B00B99AE3 /* main.cpp in Sources */,
 				9BFCC7CD2181AEF900B99AE3 /* glad.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
