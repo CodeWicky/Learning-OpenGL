@@ -11,11 +11,12 @@ void finishiRenderLoop ();
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+///此处把入参改为vec2是为了校验属性链接参数的含义，因为z都是0所以我们可以忽略z轴。相应的我输入的顶点数据和链接顶点属性都需要更改为2。
 const char *vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 0) in vec2 aPos;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
 "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
@@ -83,10 +84,10 @@ int main()
 
     ///顶点数据
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,   // 右上角
-        0.5f, -0.5f, 0.0f,  // 右下角
-        -0.5f, -0.5f, 0.0f, // 左下角
-        -0.5f, 0.5f, 0.0f   // 左上角
+        0.5f, 0.5f,    // 右上角
+        0.5f, -0.5f,  // 右下角
+        -0.5f, -0.5f,  // 左下角
+        -0.5f, 0.5f,    // 左上角
     };
     
     ///索引数据
@@ -113,7 +114,7 @@ int main()
     ///把顶点数组复制到顶点缓冲对象中
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     ///设置顶点属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     ///激活顶点属性
     glEnableVertexAttribArray(0);
     ///绑定索引缓冲对象至上下文
