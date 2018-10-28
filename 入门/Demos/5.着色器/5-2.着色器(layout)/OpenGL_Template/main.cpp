@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <math.h>
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -24,14 +24,22 @@ const char *vertexShaderSource = "#version 330 core\n"
 const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
+"uniform float delta;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(ourColor,1.0);\n"
+"if (ourColor.x == 0) {\n"
+"    FragColor = vec4(delta,ourColor.y - delta,ourColor.z - delta,1.0);\n"
+"} else if (ourColor.y == 0) {\n"
+"    FragColor = vec4(ourColor.x - delta,delta,ourColor.z - delta,1.0);\n"
+"} else if (ourColor.z == 0) {\n"
+"    FragColor = vec4(ourColor.x - delta,ourColor.y - delta,delta,1.0);\n"
+"} else {\n"
+"    FragColor = vec4(ourColor.x - delta,ourColor.y - delta,ourColor.z - delta,1.0);\n"
+"}\n"
 "}\n\0";
 
 int main()
 {
-    
     GLFWwindow * window = configOpenGL();
     
     ///创建一个顶点着色器
@@ -145,6 +153,12 @@ int main()
         
         ///使用指定着色器程序
         glUseProgram(shaderProgram);
+        
+        ///更新uniform颜色
+        float timeValue = glfwGetTime();
+        float delta = sin(timeValue) / 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "delta");
+        glUniform1f(vertexColorLocation,delta);
         ///绑定定点数组对象
         glBindVertexArray(VAO);
         ///以索引绘制顶点数据
