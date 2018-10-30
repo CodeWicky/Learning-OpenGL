@@ -90,28 +90,6 @@ int main()
     ///释放着色器
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    
-    ///加载图片
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &width, &height, &nrChannels, 0);
-    
-    ///生成纹理对象并绑定至上下文中的2D纹理
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    ///设置纹理环绕及过滤模式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    ///加载纹理数据并设置多级渐远纹理
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    ///释放图像数据
-    stbi_image_free(data);
 
     ///顶点数据
     float vertices[] = {
@@ -142,6 +120,7 @@ int main()
     
     ///绑定定点缓冲对象至上下文
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
     ///把顶点数组复制到顶点缓冲对象中
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
@@ -154,6 +133,33 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     ///把索引数据复制到索引缓冲对象中
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
+    ///设置图片加载时上下翻转
+    stbi_set_flip_vertically_on_load(true);
+    
+    ///加载图片
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &width, &height, &nrChannels, 0);
+    
+    ///生成纹理对象并绑定至上下文中的2D纹理
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    
+    ///设置纹理环绕及过滤模式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    ///加载纹理数据并设置多级渐远纹理
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+    ///释放图像数据
+    stbi_image_free(data);
+    
+    
     ///解除顶点数组对象的绑定
     glBindVertexArray(0);
     ///解除顶点缓冲对象的绑定
@@ -169,9 +175,6 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT);
-        
-        ///绑定纹理
-        glBindTexture(GL_TEXTURE_2D, texture);
         
         ///使用指定着色器程序
         glUseProgram(shaderProgram);
