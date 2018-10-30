@@ -8,39 +8,41 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 GLFWwindow * configOpenGL();
-void loadImg(const char * path,unsigned int * texture);
+void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void finishiRenderLoop();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-///此处把入参改为vec2是为了校验属性链接参数的含义，因为z都是0所以我们可以忽略z轴。相应的我输入的顶点数据和链接顶点属性都需要更改为2。
+
 const char *vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec2 aPos;\n"
 "layout (location = 1) in vec3 aColor;\n"
-"layout (location = 2) in vec2 aTexCoord;\n"
-"layout (location = 3) in float show;\n"
+"layout (location = 2) in float show;\n"
+"layout (location = 3) in vec2 aTexCoord;\n"
 "out vec3 ourColor;\n"
-"out vec2 TexCoord;\n"
 "out float Img;\n"
+"out vec2 TexCoord;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos,0.0, 1.0);\n"
 "   ourColor = aColor;\n"
-"   TexCoord = aTexCoord;\n"
 "   Img = show;\n"
+"   TexCoord = aTexCoord;\n"
 "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
-"in vec2 TexCoord;\n"
 "in float Img;\n"
+"in vec2 TexCoord;\n"
 "uniform sampler2D ourTexture;\n"
+"uniform sampler2D avatarTexture;\n"
+"uniform float factor;\n"
 "void main()\n"
 "{\n"
 "if (Img == 1.0f) {\n"
-"FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);\n"
+"FragColor = mix(texture(ourTexture, TexCoord),texture(avatarTexture, TexCoord),factor) * vec4(ourColor, 1.0);\n"
 "} else {\n"
 "FragColor = vec4(ourColor, 1.0);\n"
 "}\n"
@@ -102,7 +104,14 @@ int main()
     glDeleteShader(fragmentShader);
 
     unsigned int VAO,VBO,EBO;
+    
+    ///配置VAO
     configVAO(&VAO,&VBO,&EBO);
+    
+    ///设置纹理单元的位置（想要设置着色器程序的值，必先激活着色器程序）
+    glUseProgram(shaderProgram);
+    glUniform1i(glGetUniformLocation(shaderProgram,"ourTexture"),0);
+    glUniform1i(glGetUniformLocation(shaderProgram,"avatarTexture"),1);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -113,8 +122,13 @@ int main()
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT);
         
-        ///使用指定着色器程序
-        glUseProgram(shaderProgram);
+        ///使用指定着色器程序（由于上面已经激活过着色器程序，所以此处不用再次激活）
+//        glUseProgram(shaderProgram);
+        
+        ///改变
+        float timeValue = glfwGetTime();
+        float factor = sin(timeValue) / 2.0f + 0.5f;
+        glad_glUniform1f(glGetUniformLocation(shaderProgram,"factor"),factor);
         
         ///绑定定点数组对象
         glBindVertexArray(VAO);
@@ -177,14 +191,15 @@ GLFWwindow* configOpenGL() {
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     ///顶点数据
     float vertices[] = {
-        0.5f, 0.5f,1.0f,1.0f,0.0f,1.5f,1.5f,1.0f,    // 右上角
-        0.5f, -0.5f,0.0f,1.0f,1.0f,1.5f,-0.5f,1.0f,  // 右下角
-        -0.5f, -0.5f,1.0f,0.0f,1.0f,-0.5f,-0.5f,1.0f,  // 左下角
-        -0.5f, 0.5f,1.0f,1.0f,1.0f,-0.5f,1.5f,1.0f,    // 左上角
-        1.0f,1.0f,0.0f,0.0f,1.0f,1.5f,1.5f,0.0f,
-        1.0f,-1.0f,1.0f,0.0f,0.0f,1.5f,-1.5f,0.0f,
-        -1.0f,-1.0f,0.0f,1.0f,0.0f,-1.5f,-1.5f,0.0f,
-        -1.0f,1.0f,0.0f,0.0f,0.0f,-1.5f,1.5f,0.0f,
+        //顶点坐标-2 //颜色-3 //是否绘制图片-1 //纹理坐标-2
+        0.5f, 0.5f,1.0f,1.0f,0.0f,1.0f,1.5f,1.5f,    // 右上角
+        0.5f, -0.5f,0.0f,1.0f,1.0f,1.0f,1.5f,-0.5f,  // 右下角
+        -0.5f, -0.5f,1.0f,0.0f,1.0f,1.0f,-0.5f,-0.5f,  // 左下角
+        -0.5f, 0.5f,1.0f,1.0f,1.0f,1.0f,-0.5f,1.5f,    // 左上角
+        1.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,
+        1.0f,-1.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
+        -1.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,
+        -1.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
     };
     
     ///索引数据
@@ -221,9 +236,9 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(7 * sizeof(float)));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(3);
     ///绑定索引缓冲对象至上下文
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
@@ -231,8 +246,9 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     ///加载图片
-    unsigned int texture;
-    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &texture);
+    unsigned int texture,avatar;
+    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &texture,0);
+    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/avatar.jpeg", &avatar, 1);
     
     ///解除顶点数组对象的绑定
     glBindVertexArray(0);
@@ -242,7 +258,7 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 }
 
-void loadImg(const char * path,unsigned int * texture) {
+void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     ///设置图片加载时上下翻转
     stbi_set_flip_vertically_on_load(true);
     
@@ -252,6 +268,7 @@ void loadImg(const char * path,unsigned int * texture) {
     
     ///生成纹理对象并绑定至上下文中的2D纹理
     glGenTextures(1, texture);
+    glActiveTexture(GL_TEXTURE0 + uniteLoc);
     glBindTexture(GL_TEXTURE_2D, *texture);
     
     ///设置纹理环绕及过滤模式
