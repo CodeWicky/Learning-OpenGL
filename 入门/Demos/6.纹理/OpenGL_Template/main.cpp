@@ -1,5 +1,4 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "Shader.h"
 #include <math.h>
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
@@ -15,103 +14,21 @@ void finishiRenderLoop();
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-
-const char *vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec2 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
-"layout (location = 2) in float show;\n"
-"layout (location = 3) in vec2 aTexCoord;\n"
-"out vec3 ourColor;\n"
-"out float Img;\n"
-"out vec2 TexCoord;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos,0.0, 1.0);\n"
-"   ourColor = aColor;\n"
-"   Img = show;\n"
-"   TexCoord = aTexCoord;\n"
-"}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec3 ourColor;\n"
-"in float Img;\n"
-"in vec2 TexCoord;\n"
-"uniform sampler2D ourTexture;\n"
-"uniform sampler2D avatarTexture;\n"
-"uniform float factor;\n"
-"void main()\n"
-"{\n"
-"if (Img == 1.0f) {\n"
-"FragColor = mix(texture(ourTexture, TexCoord),texture(avatarTexture, TexCoord),factor) * vec4(ourColor, 1.0);\n"
-"} else {\n"
-"FragColor = vec4(ourColor, 1.0);\n"
-"}\n"
-"}\n\0";
-
 int main()
 {
     GLFWwindow * window = configOpenGL();
     
-    ///创建一个顶点着色器
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    Shader ourShader("Vertex.h","Fragment.h");
     
-    ///附着源码并编译
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    
-    ///检查编译是否成功
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    
-    ///创建一个片段着色器
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    
-    ///附着源码并编译
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    
-    ///检查编译是否成功
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    
-    ///创建着色器程序
-    int shaderProgram = glCreateProgram();
-    
-    ///链接着色器
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    
-    ///检查链接是否成功
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    
-    ///释放着色器
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
     unsigned int VAO,VBO,EBO;
     
     ///配置VAO
     configVAO(&VAO,&VBO,&EBO);
     
     ///设置纹理单元的位置（想要设置着色器程序的值，必先激活着色器程序）
-    glUseProgram(shaderProgram);
-    glUniform1i(glGetUniformLocation(shaderProgram,"ourTexture"),0);
-    glUniform1i(glGetUniformLocation(shaderProgram,"avatarTexture"),1);
+    ourShader.use();
+    ourShader.setInt("ourTexture", 0);
+    ourShader.setInt("avatarTexture", 1);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -122,18 +39,14 @@ int main()
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT);
         
-        ///使用指定着色器程序（由于上面已经激活过着色器程序，所以此处不用再次激活）
-//        glUseProgram(shaderProgram);
-        
-        ///改变
-        float timeValue = glfwGetTime();
-        float factor = sin(timeValue) / 2.0f + 0.5f;
-        glad_glUniform1f(glGetUniformLocation(shaderProgram,"factor"),factor);
+        float time = glfwGetTime();
+        float factor = sin(time) * 0.5 + 0.5;
+        ourShader.setFloat("factor", factor);
         
         ///绑定定点数组对象
         glBindVertexArray(VAO);
         ///以索引绘制顶点数据
-//        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //        glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES,30,GL_UNSIGNED_INT,0);
         
         ///交换颜色缓冲
@@ -201,7 +114,7 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
         -1.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,
         -1.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
     };
-    
+
     ///索引数据
     unsigned int indices[] = {
         0,1,3,
@@ -229,16 +142,16 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     
     ///绑定定点缓冲对象至上下文
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    
     ///把顶点数组复制到顶点缓冲对象中
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    ///设置顶点属性并激活属性
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,8 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glVertexAttribPointer(2,1,GL_FLOAT,GL_FALSE,8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(3);
     ///绑定索引缓冲对象至上下文
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
@@ -247,8 +160,8 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     
     ///加载图片
     unsigned int texture,avatar;
-    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &texture,0);
-    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/avatar.jpeg", &avatar, 1);
+    loadImg("container.jpg", &texture,0);
+    loadImg("avatar.jpeg", &avatar, 1);
     
     ///解除顶点数组对象的绑定
     glBindVertexArray(0);
