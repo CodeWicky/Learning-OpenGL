@@ -15,7 +15,7 @@ int main()
     
     GLFWwindow * window = configOpenGL();
     
-    Shader ourShader("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/5.着色器/5-3.着色器\(Shader Class\)/OpenGL_Template/Vertex.h","/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/5.着色器/5-3.着色器\(Shader Class\)/OpenGL_Template/Fragment.h");
+    Shader ourShader("Vertex.h","Fragment.h");
     
     
     ///顶点数据
