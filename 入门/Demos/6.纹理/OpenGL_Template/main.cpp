@@ -7,8 +7,10 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-GLFWwindow * configOpenGL ();
-void finishiRenderLoop ();
+GLFWwindow * configOpenGL();
+void loadImg(const char * path,unsigned int * texture);
+void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
+void finishiRenderLoop();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -18,22 +20,30 @@ const char *vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec2 aPos;\n"
 "layout (location = 1) in vec3 aColor;\n"
 "layout (location = 2) in vec2 aTexCoord;\n"
+"layout (location = 3) in float show;\n"
 "out vec3 ourColor;\n"
 "out vec2 TexCoord;\n"
+"out float Img;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos,0.0, 1.0);\n"
 "   ourColor = aColor;\n"
 "   TexCoord = aTexCoord;\n"
+"   Img = show;\n"
 "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
 "in vec2 TexCoord;\n"
+"in float Img;\n"
 "uniform sampler2D ourTexture;\n"
 "void main()\n"
 "{\n"
+"if (Img == 1.0f) {\n"
 "FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);\n"
+"} else {\n"
+"FragColor = vec4(ourColor, 1.0);\n"
+"}\n"
 "}\n\0";
 
 int main()
@@ -91,81 +101,8 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    ///顶点数据
-    float vertices[] = {
-        0.5f, 0.5f,1.0f,1.0f,0.0f,1.0f,1.0f,    // 右上角
-        0.5f, -0.5f,0.0f,1.0f,1.0f,1.0f,0.0f,  // 右下角
-        -0.5f, -0.5f,1.0f,0.0f,1.0f,0.0f,0.0f,  // 左下角
-        -0.5f, 0.5f,1.0f,1.0f,1.0f,0.0f,1.0f,    // 左上角
-    };
-    
-    ///索引数据
-    unsigned int indices[] = {
-        0,1,3,
-        1,2,3,
-    };
-    
-    unsigned int VBO,EBO,VAO;
-    
-    ///创建顶点数组对象
-    glGenVertexArrays(1, &VAO);
-    
-    ///创建顶点缓冲对象
-    glGenBuffers(1, &VBO);
-    ///创建索引缓冲对象
-    glGenBuffers(1, &EBO);
-
-    ///绑定定点数组对象至上下文
-    glBindVertexArray(VAO);
-    
-    ///绑定定点缓冲对象至上下文
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    ///把顶点数组复制到顶点缓冲对象中
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    ///绑定索引缓冲对象至上下文
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    ///把索引数据复制到索引缓冲对象中
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
-    ///设置图片加载时上下翻转
-    stbi_set_flip_vertically_on_load(true);
-    
-    ///加载图片
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &width, &height, &nrChannels, 0);
-    
-    ///生成纹理对象并绑定至上下文中的2D纹理
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    ///设置纹理环绕及过滤模式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    ///加载纹理数据并设置多级渐远纹理
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    ///释放图像数据
-    stbi_image_free(data);
-    
-    
-    ///解除顶点数组对象的绑定
-    glBindVertexArray(0);
-    ///解除顶点缓冲对象的绑定
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    ///解除索引缓冲对象的绑定
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+    unsigned int VAO,VBO,EBO;
+    configVAO(&VAO,&VBO,&EBO);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -183,7 +120,7 @@ int main()
         glBindVertexArray(VAO);
         ///以索引绘制顶点数据
 //        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+        glDrawElements(GL_TRIANGLES,30,GL_UNSIGNED_INT,0);
         
         ///交换颜色缓冲
         glfwSwapBuffers(window);
@@ -201,7 +138,7 @@ int main()
     return 0;
 }
 
-GLFWwindow* configOpenGL () {
+GLFWwindow* configOpenGL() {
     ///初始化glfw
     glfwInit();
     
@@ -237,7 +174,101 @@ GLFWwindow* configOpenGL () {
     return window;
 }
 
-void finishiRenderLoop () {
+void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
+    ///顶点数据
+    float vertices[] = {
+        0.5f, 0.5f,1.0f,1.0f,0.0f,1.5f,1.5f,1.0f,    // 右上角
+        0.5f, -0.5f,0.0f,1.0f,1.0f,1.5f,-0.5f,1.0f,  // 右下角
+        -0.5f, -0.5f,1.0f,0.0f,1.0f,-0.5f,-0.5f,1.0f,  // 左下角
+        -0.5f, 0.5f,1.0f,1.0f,1.0f,-0.5f,1.5f,1.0f,    // 左上角
+        1.0f,1.0f,0.0f,0.0f,1.0f,1.5f,1.5f,0.0f,
+        1.0f,-1.0f,1.0f,0.0f,0.0f,1.5f,-1.5f,0.0f,
+        -1.0f,-1.0f,0.0f,1.0f,0.0f,-1.5f,-1.5f,0.0f,
+        -1.0f,1.0f,0.0f,0.0f,0.0f,-1.5f,1.5f,0.0f,
+    };
+    
+    ///索引数据
+    unsigned int indices[] = {
+        0,1,3,
+        1,2,3,
+        0,4,5,
+        0,1,5,
+        1,5,6,
+        1,2,6,
+        2,6,7,
+        2,3,7,
+        3,7,4,
+        3,0,4,
+    };
+    
+    ///创建顶点数组对象
+    glGenVertexArrays(1, VAO);
+    
+    ///创建顶点缓冲对象
+    glGenBuffers(1, VBO);
+    ///创建索引缓冲对象
+    glGenBuffers(1, EBO);
+    
+    ///绑定定点数组对象至上下文
+    glBindVertexArray(*VAO);
+    
+    ///绑定定点缓冲对象至上下文
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    
+    ///把顶点数组复制到顶点缓冲对象中
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    ///绑定索引缓冲对象至上下文
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
+    ///把索引数据复制到索引缓冲对象中
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
+    ///加载图片
+    unsigned int texture;
+    loadImg("/Users/momo/Desktop/Wicky/Learn\ OpenGL/入门/Demos/6.纹理/OpenGL_Template/container.jpg", &texture);
+    
+    ///解除顶点数组对象的绑定
+    glBindVertexArray(0);
+    ///解除顶点缓冲对象的绑定
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    ///解除索引缓冲对象的绑定
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+}
+
+void loadImg(const char * path,unsigned int * texture) {
+    ///设置图片加载时上下翻转
+    stbi_set_flip_vertically_on_load(true);
+    
+    ///加载图片
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+    
+    ///生成纹理对象并绑定至上下文中的2D纹理
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+    
+    ///设置纹理环绕及过滤模式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    ///加载纹理数据并设置多级渐远纹理
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+    ///释放图像数据
+    stbi_image_free(data);
+}
+
+void finishiRenderLoop() {
     ///释放窗口资源
     glfwTerminate();
 }
