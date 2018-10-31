@@ -14,7 +14,6 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-    
     GLFWwindow * window = configOpenGL();
     if (NULL == window) {
         return -1;

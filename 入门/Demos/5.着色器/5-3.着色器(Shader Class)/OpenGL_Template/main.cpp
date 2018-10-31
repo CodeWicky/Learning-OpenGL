@@ -17,7 +17,6 @@ int main()
     
     Shader ourShader("Vertex.h","Fragment.h");
     
-    
     ///顶点数据
     float vertices[] = {
         0.5f, 0.5f,    // 右上角
