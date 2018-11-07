@@ -41,7 +41,6 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
     
-    
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
     glm::mat4 projection = glm::mat4(1.0f);
@@ -148,7 +147,7 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
         1,4,5,
         0,1,4,
         5,6,7,
-        4,5,6,
+        4,5,7,
         2,3,6,
         3,6,7,
         0,3,4,
