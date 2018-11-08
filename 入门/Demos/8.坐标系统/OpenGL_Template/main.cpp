@@ -73,12 +73,14 @@ int main()
         ///绑定定点数组对象
         glBindVertexArray(VAO);
         
+        float time = glfwGetTime();
+        float factor = sin(time) * 0.5 + 0.5;
+        float angle = 360 * factor;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
-            float time = glfwGetTime();
-            float factor = sin(time) * 0.5 + 0.5;
+            
             model = glm::translate(model, postions[i]);
-            float angle = 360 * factor;
+            
             model = glm::rotate(model, glm::radians(angle), rotateAxis[i]);
             ourShader.setMtx4fv("model", model);
             
