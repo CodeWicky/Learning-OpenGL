@@ -41,6 +41,19 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
     
+    glm::vec3 rotateAxis[] = {
+        glm::vec3(1.0,0.3,-0.7),
+        glm::vec3( 0.2f,  0.5f, -0.15f),
+        glm::vec3(-0.15f, -0.22f, -0.25f),
+        glm::vec3(-0.38f, -0.2f, -0.23f),
+        glm::vec3( 0.24f, -0.4f, -0.35f),
+        glm::vec3(-0.17f,  0.3f, -0.75f),
+        glm::vec3( 0.13f, -0.2f, -0.25f),
+        glm::vec3( 0.15f,  0.2f, -0.25f),
+        glm::vec3( 0.15f,  0.2f, -0.15f),
+        glm::vec3(-0.13f,  1.0f, -0.15f)
+    };
+    
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
     glm::mat4 projection = glm::mat4(1.0f);
@@ -62,11 +75,11 @@ int main()
         
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
-            
-            
+            float time = glfwGetTime();
+            float factor = sin(time) * 0.5 + 0.5;
             model = glm::translate(model, postions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            float angle = 360 * factor;
+            model = glm::rotate(model, glm::radians(angle), rotateAxis[i]);
             ourShader.setMtx4fv("model", model);
             
             ///以索引绘制顶点数据
