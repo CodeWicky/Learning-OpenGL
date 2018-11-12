@@ -14,7 +14,10 @@ void finishiRenderLoop();
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+#define zAngleThreshold (89.0 * M_PI / 180)
+
 float angle = 0;
+float zAngle = 0;
 
 int main()
 {
@@ -76,9 +79,10 @@ int main()
         ///绑定定点数组对象
         glBindVertexArray(VAO);
         
-        float camX = sin(angle) * radius;
-        float camZ = cos(angle) * radius;
-        glm::mat4 view = glm::lookAt(glm::vec3(camX,0,camZ), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f,1.f,0.f));
+        float camX = sin(angle) * cos(zAngle) * radius;
+        float camZ = cos(angle) * cos(zAngle) * radius;
+        float camY = sin(zAngle) * radius;
+        glm::mat4 view = glm::lookAt(glm::vec3(camX,camY,camZ), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f,1.f,0.f));
         ourShader.setMtx4fv("view", view);
         
         float time = glfwGetTime();
@@ -254,9 +258,25 @@ void processInput(GLFWwindow *window)
         angle -= speed;
     } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         angle += speed;
-    } else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        angle = 0;
     }
+    
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        zAngle += speed * 0.1;
+        if (zAngle >= zAngleThreshold) {
+            zAngle = zAngleThreshold;
+        }
+    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        zAngle -= speed * 0.1;
+        if (zAngle <= -zAngleThreshold) {
+            zAngle = -zAngleThreshold;
+        }
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        angle = 0;
+        zAngle = 0;
+    }
+    
 }
 
 ///窗口事件更新回调
