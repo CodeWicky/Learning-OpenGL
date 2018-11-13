@@ -18,6 +18,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 float angle = 0;
 float zAngle = 0;
+float radius = 10.f;
 
 int main()
 {
@@ -65,7 +66,7 @@ int main()
     
     ourShader.setMtx4fv("projection", projection);
     
-    float radius = 10.f;
+    
     
     while (!glfwWindowShouldClose(window))
     {
@@ -254,27 +255,40 @@ void processInput(GLFWwindow *window)
     float speed = 0.01;
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
-    } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         angle -= speed;
-    } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         angle += speed;
     }
     
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         zAngle += speed * 0.1;
         if (zAngle >= zAngleThreshold) {
             zAngle = zAngleThreshold;
         }
-    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         zAngle -= speed * 0.1;
         if (zAngle <= -zAngleThreshold) {
             zAngle = -zAngleThreshold;
         }
     }
     
+    if (glfwGetKey(window, GLFW_KEY_Q)) {
+        radius -= speed;
+        if (radius < 0.1) {
+            radius = 0.1;
+        }
+    } else if (glfwGetKey(window, GLFW_KEY_E)) {
+        radius += speed;
+        if (radius > 100) {
+            radius = 100;
+        }
+    }
+    
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         angle = 0;
         zAngle = 0;
+        radius = 10;
     }
     
 }
