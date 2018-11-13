@@ -255,7 +255,9 @@ void processInput(GLFWwindow *window)
     float speed = 0.01;
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
-    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         angle -= speed;
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         angle += speed;
