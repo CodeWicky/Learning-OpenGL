@@ -10,6 +10,7 @@ GLFWwindow * configOpenGL();
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void finishiRenderLoop();
+float timeIntervalToLastFrame();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -19,10 +20,11 @@ const unsigned int SCR_HEIGHT = 600;
 glm::vec3 position = glm::vec3(0.f,0.f,3.f);
 glm::vec3 front = glm::vec3(0.f,0.f,-1.f);
 glm::vec3 up = glm::vec3(0.f,1.f,0.f);
-float g = 0.0098;
+float g = 0.01;
 float jumpSpeed = 5;
 float currentSpeed = 0;
 bool jumping = false;
+float lastFrameTS = 0;
 
 int main()
 {
@@ -90,15 +92,15 @@ int main()
             if (currentSpeed <= -jumpSpeed) {
                 currentSpeed = 0;
                 jumping = false;
-                position = glm::vec3(position.x,0.f,position.z);
+                position -= glm::vec3(0.f,position.y,0.f);
             }
         }
         
         glm::mat4 view = glm::lookAt(position, position + front, up);
         ourShader.setMtx4fv("view", view);
         
-        float time = glfwGetTime();
-        float factor = sin(time) * 0.5 + 0.5;
+        lastFrameTS = glfwGetTime();
+        float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -128,6 +130,13 @@ int main()
     finishiRenderLoop();
     
     return 0;
+}
+
+float timeIntervalToLastFrame () {
+    if (lastFrameTS <= 0) {
+        return 0;
+    }
+    return glfwGetTime() - lastFrameTS;
 }
 
 GLFWwindow* configOpenGL() {
@@ -263,7 +272,7 @@ void finishiRenderLoop() {
 ///处理输入
 void processInput(GLFWwindow *window)
 {
-    float speed = 0.01;
+    float speed = 10 * timeIntervalToLastFrame();
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
