@@ -5,6 +5,7 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 GLFWwindow * configOpenGL();
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
@@ -20,11 +21,16 @@ const unsigned int SCR_HEIGHT = 600;
 glm::vec3 position = glm::vec3(0.f,0.f,3.f);
 glm::vec3 front = glm::vec3(0.f,0.f,-1.f);
 glm::vec3 up = glm::vec3(0.f,1.f,0.f);
-float g = 0.01;
-float jumpSpeed = 5;
+float g = 0.05;
+float jumpSpeed = 30;
 float currentSpeed = 0;
 bool jumping = false;
 float lastFrameTS = 0;
+bool firstCursor = true;
+float lastCursorX = 0;
+float lastCursorY = 0;
+float pitch = 0;
+float yaw = -90;
 
 int main()
 {
@@ -102,6 +108,7 @@ int main()
         lastFrameTS = glfwGetTime();
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
+        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             
@@ -166,6 +173,10 @@ GLFWwindow* configOpenGL() {
     glfwMakeContextCurrent(window);
     ///设置窗口事件更新触发的回调
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    ///设置鼠标事件回调
+    glfwSetCursorPosCallback(window, mouse_callback);
+    ///设置不显示鼠标
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     ///初始化GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -298,9 +309,44 @@ void processInput(GLFWwindow *window)
     
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         position = glm::vec3(0.f,0.f,3.f);
+        front = glm::vec3(0.f,0.f,-1.f);
+        pitch = 0;
+        yaw = -90;
         jumping = false;
     }
     
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (firstCursor) {
+        lastCursorX = xpos;
+        lastCursorY = ypos;
+        firstCursor = false;
+        return;
+    }
+    
+    float xoffset = xpos - lastCursorX;
+    float yoffset = lastCursorY - ypos;
+    lastCursorX = xpos;
+    lastCursorY = ypos;
+    
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+    
+    yaw += xoffset;
+    pitch += yoffset;
+    
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    } else if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
+    glm::vec3 tmp;
+    tmp.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    tmp.y = sin(glm::radians(pitch));
+    tmp.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front = glm::normalize(tmp);
 }
 
 ///窗口事件更新回调

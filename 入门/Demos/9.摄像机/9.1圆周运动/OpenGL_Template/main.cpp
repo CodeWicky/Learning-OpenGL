@@ -89,6 +89,7 @@ int main()
         float time = glfwGetTime();
         float factor = sin(time) * 0.5 + 0.5;
         float angle = 360 * factor;
+        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             
