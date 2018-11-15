@@ -31,6 +31,7 @@ float lastCursorX = 0;
 float lastCursorY = 0;
 float pitch = 0;
 float yaw = -90;
+float fov = 45.f;
 
 int main()
 {
@@ -72,14 +73,6 @@ int main()
         glm::vec3(-0.13f,  1.0f, -0.15f)
     };
     
-    
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
-    
-    ourShader.setMtx4fv("projection", projection);
-    
-    
-    
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -104,6 +97,9 @@ int main()
         
         glm::mat4 view = glm::lookAt(position, position + front, up);
         ourShader.setMtx4fv("view", view);
+        
+        glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
+        ourShader.setMtx4fv("projection", projection);
         
         lastFrameTS = glfwGetTime();
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
@@ -300,6 +296,18 @@ void processInput(GLFWwindow *window)
         position -= front * speed;
     }
     
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        fov -= speed;
+        if (fov < 1.0) {
+            fov = 1.0;
+        }
+    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        fov += speed;
+        if (fov > 45.0) {
+            fov = 45.0;
+        }
+    }
+    
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         if (!jumping) {
             currentSpeed = jumpSpeed;
@@ -312,6 +320,7 @@ void processInput(GLFWwindow *window)
         front = glm::vec3(0.f,0.f,-1.f);
         pitch = 0;
         yaw = -90;
+        fov = 45.0;
         jumping = false;
     }
     
