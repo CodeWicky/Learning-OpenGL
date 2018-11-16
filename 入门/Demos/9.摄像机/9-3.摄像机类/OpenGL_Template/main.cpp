@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Camera.h"
 #include <math.h>
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
@@ -30,7 +31,7 @@ bool firstCursor = true;
 float lastCursorX = 0;
 float lastCursorY = 0;
 float pitch = 0;
-float yaw = -90;
+float yaw = -180;
 float fov = 45.f;
 
 int main()
@@ -319,7 +320,7 @@ void processInput(GLFWwindow *window)
         position = glm::vec3(0.f,0.f,3.f);
         front = glm::vec3(0.f,0.f,-1.f);
         pitch = 0;
-        yaw = -90;
+        yaw = -180;
         fov = 45.0;
         jumping = false;
     }
@@ -343,7 +344,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
     
-    yaw += xoffset;
+    yaw -= xoffset;
     pitch += yoffset;
     
     if (pitch > 89.0f) {
@@ -352,9 +353,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         pitch = -89.0f;
     }
     glm::vec3 tmp;
-    tmp.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+//    tmp.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+//    tmp.y = sin(glm::radians(pitch));
+//    tmp.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    tmp.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
     tmp.y = sin(glm::radians(pitch));
-    tmp.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    tmp.z = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
     front = glm::normalize(tmp);
 }
 
