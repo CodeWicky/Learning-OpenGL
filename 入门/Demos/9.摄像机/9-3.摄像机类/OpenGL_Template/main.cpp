@@ -18,9 +18,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 #define zAngleThreshold (89.0 * M_PI / 180)
 
-glm::vec3 position = glm::vec3(0.f,0.f,3.f);
-glm::vec3 front = glm::vec3(0.f,0.f,-1.f);
-glm::vec3 up = glm::vec3(0.f,1.f,0.f);
+
 float g = 0.05;
 float jumpSpeed = 30;
 float currentSpeed = 0;
@@ -29,8 +27,6 @@ float lastFrameTS = 0;
 bool firstCursor = true;
 float lastCursorX = 0;
 float lastCursorY = 0;
-float pitch = 0;
-float yaw = 0;
 float fov = 45.f;
 Camera camera;
 
@@ -89,16 +85,16 @@ int main()
         glBindVertexArray(VAO);
         
         if (jumping) {
-            position += up * (float)(currentSpeed * 0.01);
+            camera.Position += camera.WorldUp * (float)(currentSpeed * 0.01);
             currentSpeed -= g;
             if (currentSpeed <= -jumpSpeed) {
                 currentSpeed = 0;
                 jumping = false;
-                position -= glm::vec3(0.f,position.y,0.f);
+                camera.Position -= glm::vec3(0.f,camera.Position.y,0.f);
             }
         }
         
-        glm::mat4 view = glm::lookAt(position, position + front, up);
+        glm::mat4 view = camera.getViewMatrix();
         ourShader.setMtx4fv("view", view);
         
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
@@ -173,9 +169,9 @@ GLFWwindow* configOpenGL() {
     ///设置窗口事件更新触发的回调
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     ///设置鼠标事件回调
-//    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
     ///设置不显示鼠标
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     ///初始化GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -288,23 +284,29 @@ void processInput(GLFWwindow *window)
     }
     
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        position -= glm::normalize(glm::cross(front, up)) * speed;
+        camera.move(LEFT, timeIntervalToLastFrame());
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        position += glm::normalize(glm::cross(front, up)) * speed;
+        camera.move(RIGHT, timeIntervalToLastFrame());
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        position += front * speed;
+        camera.move(FORWARD, timeIntervalToLastFrame());
     } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        position -= front * speed;
+        camera.move(BACKWARD, timeIntervalToLastFrame());
     }
     
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        camera.move(UPWARD, timeIntervalToLastFrame());
+    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        camera.move(DOWNWARD, timeIntervalToLastFrame());
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
         fov -= speed;
         if (fov < 1.0) {
             fov = 1.0;
         }
-    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+    } else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
         fov += speed;
         if (fov > 45.0) {
             fov = 45.0;
@@ -319,10 +321,7 @@ void processInput(GLFWwindow *window)
     }
     
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        position = glm::vec3(0.f,0.f,3.f);
-        front = glm::vec3(0.f,0.f,-1.f);
-        pitch = 0;
-        yaw = 0.f;
+        camera.resetCamera();
         fov = 45.0;
         jumping = false;
     }
@@ -346,6 +345,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
     
+    float yaw = camera.Yaw;
+    float pitch = camera.Pitch;
     yaw += xoffset;
     pitch += yoffset;
     
@@ -354,11 +355,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     } else if (pitch < -89.0f) {
         pitch = -89.0f;
     }
-    glm::vec3 tmp;
-    tmp.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-    tmp.y = sin(glm::radians(pitch));
-    tmp.z = -cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-    front = glm::normalize(tmp);
+    camera.setPitch(pitch);
+    camera.setYaw(yaw);
+    camera.updateCameraVectors();
 }
 
 ///窗口事件更新回调

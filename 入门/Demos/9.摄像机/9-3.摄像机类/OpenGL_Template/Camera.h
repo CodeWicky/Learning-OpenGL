@@ -43,6 +43,7 @@ public:
     float MovementSpeed;
     float MouseSensityvity;
     
+    ///构造方法
     Camera(glm::vec3 origin = glm::vec3(0.f,0.f,0.f),glm::vec3 up = glm::vec3(0.f,1.f,0.f),float pitch = PITCH,float yaw = YAW,float speed = SPEED,float sensityvity = SENSITYVITY) {
         Position = origin;
         setDefaultOrigin(origin);
@@ -57,6 +58,7 @@ public:
         updateCameraVectors();
     }
     
+    ///朝指定方向移动
     void move(Camera_Movement movement,float deltaTime) {
         switch (movement) {
             case FORWARD:
@@ -94,49 +96,68 @@ public:
         }
     }
     
+    ///设置移动速度
     void setSpeed(float speed = SPEED) {
         MovementSpeed = speed;
     }
     
+    ///设置鼠标灵敏度
     void setSensityvity(float sensityvity = SENSITYVITY) {
         MouseSensityvity = sensityvity;
     }
     
+    ///设置俯仰角
     void setPitch(float pitch) {
         Pitch = pitch;
-        updateCameraVectors();
     }
     
+    ///设置偏航角
     void setYaw(float yaw) {
         Yaw = yaw;
-        updateCameraVectors();
     }
     
+    ///设置世界坐标系中的上向量
     void setWorldUp (glm::vec3 worldUp) {
         WorldUp = worldUp;
-        updateCameraVectors();
     }
     
+    ///改变俯仰角、偏航角或世界坐标上向量后需要更新摄像机的方向向量
+    void updateCameraVectors() {
+        glm::vec3 front;
+        front.x = cos(glm::radians(Pitch)) * sin(glm::radians(Yaw));
+        front.y = sin(glm::radians(Pitch));
+        front.z = -cos(glm::radians(Pitch)) * cos(glm::radians(Yaw));
+        Front = front;
+        Right = glm::normalize(glm::cross(Front, WorldUp));
+        Up = glm::normalize(glm::cross(Right, Front));
+    }
+    
+    ///设置默认的俯仰角
     void setDefaultPicth(float pitch) {
         DefaultPitch = pitch;
     }
     
+    ///设置默认的偏航角
     void setDefaultYaw(float yaw) {
         DefaultYaw = yaw;
     }
     
+    ///设置默认的摄像机位置
     void setDefaultOrigin(glm::vec3 camera) {
         DefaultOrigin = camera;
     }
     
+    ///设置默认的世界坐标上向量
     void setDefaultWorldUp(glm::vec3 worldUp) {
         DefaultWorldUp = worldUp;
     }
     
+    ///获取当前的观察矩阵
     glm::mat4 getViewMatrix() {
         return glm::lookAt(Position, Position + Front, WorldUp);
     }
     
+    ///重置摄像机至默认状态
     void resetCamera() {
         Position = DefaultOrigin;
         WorldUp = DefaultWorldUp;
@@ -150,16 +171,6 @@ private:
     glm::vec3 DefaultWorldUp;
     float DefaultPitch;
     float DefaultYaw;
-    
-    void updateCameraVectors() {
-        glm::vec3 front;
-        front.x = cos(glm::radians(Pitch)) * sin(glm::radians(Yaw));
-        front.y = sin(glm::radians(Pitch));
-        front.z = -cos(glm::radians(Pitch)) * cos(glm::radians(Yaw));
-        Front = front;
-        Right = glm::normalize(glm::cross(WorldUp, Front));
-        Up = glm::normalize(glm::cross(Front, Right));
-    }
 };
 
 #endif /* Camera_h */
