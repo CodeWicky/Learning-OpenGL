@@ -13,7 +13,6 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void finishiRenderLoop();
 float timeIntervalToLastFrame();
-// settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
