@@ -11,6 +11,7 @@ void processInput(GLFWwindow *window);
 GLFWwindow * configOpenGL();
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
+void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void finishiRenderLoop();
 float timeIntervalToLastFrame();
 const unsigned int SCR_WIDTH = 800;
@@ -36,15 +37,22 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
     Shader ourShader("Vertex.h","Fragment.h");
+    Shader lightShader("Vertex.h","LightFragment.h");
+    
     Camera tmp;
     camera = tmp;
     
-    unsigned int VAO,VBO,EBO;
-    
     ///配置VAO
-    configVAO(&VAO,&VBO,&EBO);
+    unsigned int ToyVAO,ToyVBO,ToyEBO;
+    configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
+    
+    ///配置灯泡
+    unsigned int LightVAO,LightVBO,LightEBO;
+    configLight(&LightVAO,&LightVBO,&LightEBO);
     
     ourShader.use();
+    ourShader.setVec3f("lightColor", 1.f, 0.f, 0.f);
+    lightShader.use();
     
     glm::vec3 postions[] = {
         glm::vec3(0.0,0.0,0.0),
@@ -81,11 +89,23 @@ int main()
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        lightShader.use();
         ///绑定定点数组对象
-        glBindVertexArray(VAO);
+        glBindVertexArray(LightVAO);
+        glm::mat4 lightView = camera.getViewMatrix();
+        lightShader.setMtx4fv("view", lightView);
+        glm::mat4 lightProjection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
+        lightShader.setMtx4fv("projection", lightProjection);
+        glm::mat4 lightModel = glm::mat4(1.0f);
+        lightModel = glm::translate(lightModel, glm::vec3(13.5f,13.5f,-30.f));
+        lightShader.setMtx4fv("model", lightModel);
+
+        ///以索引绘制顶点数据
+        glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         
         if (jumping) {
-            camera.Position += camera.WorldUp * (float)(currentSpeed * 0.01);
+            float factor = timeIntervalToLastFrame();
+            camera.Position += camera.WorldUp * (float)(currentSpeed * factor);
             currentSpeed -= g;
             if (currentSpeed <= -jumpSpeed) {
                 currentSpeed = 0;
@@ -94,6 +114,8 @@ int main()
             }
         }
         
+        ourShader.use();
+        glBindVertexArray(ToyVAO);
         glm::mat4 view = camera.getViewMatrix();
         ourShader.setMtx4fv("view", view);
         
@@ -125,9 +147,9 @@ int main()
     }
     
     ///释放对象
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &ToyVAO);
+    glDeleteBuffers(1, &ToyVBO);
+    glDeleteBuffers(1, &ToyEBO);
     
     finishiRenderLoop();
     
@@ -230,6 +252,66 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    ///绑定索引缓冲对象至上下文
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
+    ///把索引数据复制到索引缓冲对象中
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
+    ///解除顶点数组对象的绑定
+    glBindVertexArray(0);
+    ///解除顶点缓冲对象的绑定
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    ///解除索引缓冲对象的绑定
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+}
+
+void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
+    ///顶点数据
+    float vertices[] = {
+        0.5,0.5,0.5,
+        0.5,-0.5,0.5,
+        -0.5,-0.5,0.5,
+        -0.5,0.5,0.5,
+        0.5,0.5,-0.5,
+        0.5,-0.5,-0.5,
+        -0.5,-0.5,-0.5,
+        -0.5,0.5,-0.5,
+    };
+    
+    ///索引数据
+    unsigned int indices[] = {
+        0,1,2,
+        0,2,3,
+        1,4,5,
+        0,1,4,
+        5,6,7,
+        4,5,7,
+        2,3,6,
+        3,6,7,
+        0,3,4,
+        3,4,7,
+        1,5,6,
+        1,2,6,
+    };
+    
+    ///创建顶点数组对象
+    glGenVertexArrays(1, VAO);
+    
+    ///创建顶点缓冲对象
+    glGenBuffers(1, VBO);
+    ///创建索引缓冲对象
+    glGenBuffers(1, EBO);
+    
+    ///绑定定点数组对象至上下文
+    glBindVertexArray(*VAO);
+    
+    ///绑定定点缓冲对象至上下文
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    ///把顶点数组复制到顶点缓冲对象中
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    ///设置顶点属性并激活属性
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
     ///绑定索引缓冲对象至上下文
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
     ///把索引数据复制到索引缓冲对象中

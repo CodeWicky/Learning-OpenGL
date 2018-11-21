@@ -93,6 +93,9 @@ class Shader {
     void setFloat(const std::string &name ,GLfloat value) const {
         glUniform1f(glGetUniformLocation(ID,name.c_str()),value);
     }
+    void setVec3f(const std::string &name ,GLfloat x,GLfloat y,GLfloat z) const {
+        glUniform3f(glGetUniformLocation(ID,name.c_str()),x,y,z);
+    }
     void setVec4f(const std::string &name ,GLfloat x,GLfloat y,GLfloat z,GLfloat w) const {
         glUniform4f(glGetUniformLocation(ID,name.c_str()),x,y,z,w);
     }
