@@ -265,12 +265,12 @@ void processInput(GLFWwindow *window)
     }
     
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        zAngle += speed * 0.1;
+        zAngle += speed;
         if (zAngle >= zAngleThreshold) {
             zAngle = zAngleThreshold;
         }
     } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        zAngle -= speed * 0.1;
+        zAngle -= speed;
         if (zAngle <= -zAngleThreshold) {
             zAngle = -zAngleThreshold;
         }
