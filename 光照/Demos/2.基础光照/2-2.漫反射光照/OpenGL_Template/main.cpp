@@ -57,7 +57,6 @@ int main()
     configLight(&LightVAO,&LightVBO,&LightEBO);
     
     ourShader.use();
-//    ourShader.setVec3f("lightColor", 1.f, 0.f, 0.f);
     ourShader.setVec3f("ambientColor", light.getAmbientColor());
     ourShader.setVec3f("lightPosition", light.Position);
     ourShader.setVec3f("lightColor", light.Color);
