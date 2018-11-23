@@ -38,31 +38,46 @@ int main()
     GLFWwindow * window = configOpenGL();
     
     glEnable(GL_DEPTH_TEST);
+    ///模型着色器程序
     Shader ourShader("Vertex.h","Fragment.h");
+    ///光源着色器程序
     Shader lightShader("Vertex.h","LightFragment.h");
     
+    ///摄像机
     camera = Camera();
     camera.setDefaultOrigin(glm::vec3(0.f,0.f,3.f));
     camera.resetCamera();
     
+    ///光源
     light = Light();
-    light.Position = glm::vec3(0.f,0.f,-10.f);
+    light.Position = glm::vec3(10.f,0.f,10.f);
+    light.Color = glm::vec3(1.f,1.f,0.f);
     
-    ///配置VAO
+    ///配置模型VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
     configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
     
-    ///配置灯泡
+    ///配置灯泡VAO
     unsigned int LightVAO,LightVBO,LightEBO;
     configLight(&LightVAO,&LightVBO,&LightEBO);
     
+    ///设置模型着色器程序相关参数
     ourShader.use();
-    ourShader.setVec3f("ambientColor", light.getAmbientColor());
+    ///环境光照强度
+    ourShader.setFloat("ambientStrength", light.AmbientStrength);
+    ///镜面光照强度
+    ourShader.setFloat("specularStrength", light.SpecularStrength);
+    ///光源位置
     ourShader.setVec3f("lightPosition", light.Position);
+    ///设置光源颜色
     ourShader.setVec3f("lightColor", light.Color);
+    
+    ///设置光源着色器相关参数
     lightShader.use();
+    ///设置光源展示颜色
     lightShader.setVec3f("lightColor", glm::vec3(1.f,0.75f,0.f));
     
+    ///模型偏移量数组
     glm::vec3 postions[] = {
         glm::vec3(0.0,0.0,0.0),
         glm::vec3( 2.0f,  5.0f, -15.0f),
@@ -76,6 +91,7 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
     
+    ///模型旋转轴数组
     glm::vec3 rotateAxis[] = {
         glm::vec3(1.0,0.3,-0.7),
         glm::vec3( 0.2f,  0.5f, -0.15f),
@@ -98,20 +114,25 @@ int main()
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        ///开始绘制光源
         lightShader.use();
         ///绑定定点数组对象
         glBindVertexArray(LightVAO);
+        ///设置光源的观察矩阵
         glm::mat4 lightView = camera.getViewMatrix();
         lightShader.setMtx4fv("view", lightView);
+        ///设置光源的裁剪矩阵
         glm::mat4 lightProjection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
         lightShader.setMtx4fv("projection", lightProjection);
+        ///设置光源的模型矩阵
         glm::mat4 lightModel = glm::mat4(1.0f);
         lightModel = glm::translate(lightModel, light.Position);
         lightShader.setMtx4fv("model", lightModel);
 
-        ///以索引绘制顶点数据
+        ///以索引绘制光源模型
         glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         
+        ///判断是否正在跳跃，来改变摄像头位置模拟跳跃行为
         if (jumping) {
             float factor = timeIntervalToLastFrame();
             camera.Position += camera.WorldUp * (float)(currentSpeed * factor);
@@ -123,11 +144,17 @@ int main()
             }
         }
         
+        ///开始绘制模型
         ourShader.use();
         glBindVertexArray(ToyVAO);
+        
+        ///设置观察点位置
+        glm::vec3 viewPos = camera.Position;
+        ourShader.setVec3f("viewPosition", viewPos);
+        
+        ///设置转换矩阵
         glm::mat4 view = camera.getViewMatrix();
         ourShader.setMtx4fv("view", view);
-        
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
         ourShader.setMtx4fv("projection", projection);
         
