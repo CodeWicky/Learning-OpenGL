@@ -52,7 +52,7 @@ public:
         Pitch = pitch;
         setDefaultPicth(pitch);
         Yaw = yaw;
-        setDefaultPicth(yaw);
+        setDefaultYaw(yaw);
         MovementSpeed = speed;
         MouseSensityvity = sensityvity;
         updateCameraVectors();
