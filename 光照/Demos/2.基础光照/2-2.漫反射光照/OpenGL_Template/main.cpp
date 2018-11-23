@@ -46,7 +46,7 @@ int main()
     camera.resetCamera();
     
     light = Light();
-    light.Position = glm::vec3(13.5f,13.5f,-30.f);
+    light.Position = glm::vec3(0.f,0.f,-10.f);
     
     ///配置VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
