@@ -19,4 +19,3 @@
 	- 2.1 [颜色](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/1.%E9%A2%9C%E8%89%B2.md)
 	- 2.2 [基础光照](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/2.%E5%9F%BA%E7%A1%80%E5%85%89%E7%85%A7.md)
     
-	
