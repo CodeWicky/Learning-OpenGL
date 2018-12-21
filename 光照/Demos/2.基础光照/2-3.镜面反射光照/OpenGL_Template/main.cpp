@@ -140,7 +140,7 @@ int main()
             if (currentSpeed <= -jumpSpeed) {
                 currentSpeed = 0;
                 jumping = false;
-                camera.Position *= glm::vec3(1.f,0.f,1.f);
+//                camera.Position *= glm::vec3(1.f,0.f,1.f);
             }
         }
         
