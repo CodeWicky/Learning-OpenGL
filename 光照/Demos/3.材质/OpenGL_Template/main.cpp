@@ -6,6 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+///函数声明
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
@@ -15,12 +16,12 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void finishiRenderLoop();
 float timeIntervalToLastFrame();
+
+///常量
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-#define zAngleThreshold (89.0 * M_PI / 180)
-
-
+///属性
 float g = 0.05;
 float jumpSpeed = 10;
 float currentSpeed = 0;
@@ -48,10 +49,8 @@ int main()
     camera.setDefaultOrigin(glm::vec3(0.f,0.f,3.f));
     camera.resetCamera();
     
-    ///光源
-    light = Light();
-    light.Position = glm::vec3(10.f,0.f,10.f);
-    light.Color = glm::vec3(1.f,1.f,1.f);
+    ///光源属性
+    light = Light(glm::vec3(1.0,1.0,1.0),glm::vec3(10.f,0.f,10.f));
     
     ///配置模型VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
@@ -66,9 +65,9 @@ int main()
     
     ///设置光的属性
     ourShader.setVec3f("light.position", light.Position);
-    ourShader.setVec3f("light.ambient", glm::vec3(0.2));
-    ourShader.setVec3f("light.diffuse", glm::vec3(0.5));
-    ourShader.setVec3f("light.specular", glm::vec3(1.0));
+    ourShader.setVec3f("light.ambient", light.AmbientColor);
+    ourShader.setVec3f("light.diffuse", light.DiffuseColor);
+    ourShader.setVec3f("light.specular", light.SpecularColor);
     
     ///设置材质
     ourShader.setVec3f("material.ambient", glm::vec3(1.f,0.5f,0.31f));
@@ -163,9 +162,19 @@ int main()
         ourShader.setMtx4fv("projection", projection);
         
         lastFrameTS = glfwGetTime();
+        
+        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
+        light.updateLightColor(tmpLightColor);
+        
+        ///设置光的属性
+        ourShader.setVec3f("light.position", light.Position);
+        ourShader.setVec3f("light.ambient", light.AmbientColor);
+        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
+        ourShader.setVec3f("light.specular", light.SpecularColor);
+        
+        
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
-        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, postions[i]);
