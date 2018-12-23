@@ -51,7 +51,7 @@ int main()
     ///光源
     light = Light();
     light.Position = glm::vec3(10.f,0.f,10.f);
-    light.Color = glm::vec3(1.f,1.f,0.f);
+    light.Color = glm::vec3(1.f,1.f,1.f);
     
     ///配置模型VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
@@ -63,14 +63,18 @@ int main()
     
     ///设置模型着色器程序相关参数
     ourShader.use();
-    ///环境光照强度
-    ourShader.setFloat("ambientStrength", light.AmbientStrength);
-    ///镜面光照强度
-    ourShader.setFloat("specularStrength", light.SpecularStrength);
-    ///光源位置
-    ourShader.setVec3f("lightPosition", light.Position);
-    ///设置光源颜色
-    ourShader.setVec3f("lightColor", light.Color);
+    
+    ///设置光的属性
+    ourShader.setVec3f("light.position", light.Position);
+    ourShader.setVec3f("light.ambient", glm::vec3(0.2));
+    ourShader.setVec3f("light.diffuse", glm::vec3(0.5));
+    ourShader.setVec3f("light.specular", glm::vec3(1.0));
+    
+    ///设置材质
+    ourShader.setVec3f("material.ambient", glm::vec3(1.f,0.5f,0.31f));
+    ourShader.setVec3f("material.diffuse", glm::vec3(1.f,0.5f,0.31f));
+    ourShader.setVec3f("material.specular", glm::vec3(0.5f,0.5f,0.5f));
+    ourShader.setFloat("material.shininess", 32.0f);
     
     ///设置光源着色器相关参数
     lightShader.use();
