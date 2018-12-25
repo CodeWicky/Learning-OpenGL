@@ -160,7 +160,7 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     
     ///加载图片
     unsigned int texture,avatar;
-    loadImg("container.jpg", &texture,0);
+    loadImg("container2.png", &texture,0);
     loadImg("avatar.jpeg", &avatar, 1);
     
     ///解除顶点数组对象的绑定
@@ -199,7 +199,7 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     ///加载纹理数据并设置多级渐远纹理
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     
     ///释放图像数据

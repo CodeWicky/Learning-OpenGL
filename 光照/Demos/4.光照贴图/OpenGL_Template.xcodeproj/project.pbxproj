@@ -35,6 +35,7 @@
 		9B25E9422185A29100F5DC49 /* Fragment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Fragment.h; sourceTree = "<group>"; };
 		9B25E94921889EB600F5DC49 /* avatar.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = avatar.jpeg; sourceTree = "<group>"; };
 		9B25E94B21889EB600F5DC49 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		9B2DA55721D28DF5008F1A9A /* container2_specular.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container2_specular.png; sourceTree = "<group>"; };
 		9B44B30021CE24FF00913032 /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
 		9B44B30221CE24FF00913032 /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
 		9B44B30321CE24FF00913032 /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
@@ -925,6 +926,7 @@
 			children = (
 				9B25E94921889EB600F5DC49 /* avatar.jpeg */,
 				9BED66F021D2546C00A10FEC /* container2.png */,
+				9B2DA55721D28DF5008F1A9A /* container2_specular.png */,
 				9B25E94B21889EB600F5DC49 /* stb_image.h */,
 				9BFCC7BA2181AE5B00B99AE3 /* main.cpp */,
 				9BA24628219EB31900365780 /* Camera.h */,

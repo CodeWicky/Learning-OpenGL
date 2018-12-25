@@ -44,9 +44,9 @@ int main()
     ///光源着色器程序
     Shader lightShader("Vertex.h","LightFragment.h");
     
-    unsigned int texture;
+    unsigned int texture,tex_specular;
     loadImg("container2.png", &texture,0);
-    
+    loadImg("container2_specular.png", &tex_specular, 1);
     ///摄像机
     camera = Camera();
     camera.setDefaultOrigin(glm::vec3(0.f,0.f,3.f));
@@ -74,7 +74,7 @@ int main()
     
     ///设置材质
     ourShader.setInt("material.diffuse", 0);
-    ourShader.setVec3f("material.specular", glm::vec3(0.5f,0.5f,0.5f));
+    ourShader.setInt("material.specular", 1);
     ourShader.setFloat("material.shininess", 32.0f);
     
     ///设置光源着色器相关参数
@@ -165,19 +165,18 @@ int main()
         
         lastFrameTS = glfwGetTime();
         
-//        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
-//        light.updateLightColor(tmpLightColor);
+        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
+        light.updateLightColor(tmpLightColor);
         
-//        ///设置光的属性
-//        ourShader.setVec3f("light.position", light.Position);
-//        ourShader.setVec3f("light.ambient", light.AmbientColor);
-//        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
-//        ourShader.setVec3f("light.specular", light.SpecularColor);
+        ///设置光的属性
+        ourShader.setVec3f("light.position", light.Position);
+        ourShader.setVec3f("light.ambient", light.AmbientColor);
+        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
+        ourShader.setVec3f("light.specular", light.SpecularColor);
         
         
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
-        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, postions[i]);
@@ -399,6 +398,15 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
     
+    GLenum format = 0;
+    if (nrChannels == 0) {
+        format = GL_RED;
+    } else if (nrChannels == 1) {
+        format = GL_RGB;
+    } else if (nrChannels == 4) {
+        format = GL_RGBA;
+    }
+    
     ///生成纹理对象并绑定至上下文中的2D纹理
     glGenTextures(1, texture);
     glActiveTexture(GL_TEXTURE0 + uniteLoc);
@@ -411,7 +419,7 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     ///加载纹理数据并设置多级渐远纹理
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     
     ///释放图像数据

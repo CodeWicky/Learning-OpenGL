@@ -36,6 +36,7 @@
 		9B25E94921889EB600F5DC49 /* avatar.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = avatar.jpeg; sourceTree = "<group>"; };
 		9B25E94A21889EB600F5DC49 /* container.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = container.jpg; sourceTree = "<group>"; };
 		9B25E94B21889EB600F5DC49 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		9B2DA55621D286C9008F1A9A /* container2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container2.png; sourceTree = "<group>"; };
 		9B6DC16E21A53E1D00501A6E /* khrplatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = khrplatform.h; sourceTree = "<group>"; };
 		9B6DC17021A53E1D00501A6E /* glad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glad.h; sourceTree = "<group>"; };
 		9B6DC17121A53E1D00501A6E /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glad.c; sourceTree = "<group>"; };
@@ -922,6 +923,7 @@
 			children = (
 				9B25E94921889EB600F5DC49 /* avatar.jpeg */,
 				9B25E94A21889EB600F5DC49 /* container.jpg */,
+				9B2DA55621D286C9008F1A9A /* container2.png */,
 				9B25E94B21889EB600F5DC49 /* stb_image.h */,
 				9BFCC7BA2181AE5B00B99AE3 /* main.cpp */,
 				9B25E93D218599B400F5DC49 /* Shader.h */,
