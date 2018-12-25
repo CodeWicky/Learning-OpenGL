@@ -1,8 +1,7 @@
 #version 330 core
 
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
+    sampler2D diffuse;
     vec3 specular;
     float shininess;
 };
@@ -16,6 +15,8 @@ struct Light {
 
 ///输出颜色
 out vec4 FragColor;
+///纹理坐标
+in vec2 TexCoord;
 ///法向量
 in vec3 normal;
 ///顶点世界坐标
@@ -29,12 +30,13 @@ uniform Light light;
 void main()
 {
     ///环境光照
-    vec3 ambientColor = light.ambient * material.ambient;
+    vec3 ambientColor = light.ambient * vec3(texture(material.diffuse, TexCoord));
+    
     ///漫反射光照
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - fragPosition);
     float factor = max(dot(norm,lightDir),0.0);
-    vec3 diffuseColor = light.diffuse * (factor * material.diffuse);
+    vec3 diffuseColor = light.diffuse * factor * vec3(texture(material.diffuse, TexCoord));
     
     ///镜面反射光照
     vec3 reflectDir = reflect(-lightDir, norm);

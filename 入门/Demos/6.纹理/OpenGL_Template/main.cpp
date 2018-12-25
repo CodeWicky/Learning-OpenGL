@@ -179,6 +179,14 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
     
+    GLenum format = 0;
+    if (nrChannels == 1)
+        format = GL_RED;
+    else if (nrChannels == 3)
+        format = GL_RGB;
+    else if (nrChannels == 4)
+        format = GL_RGBA;
+    
     ///生成纹理对象并绑定至上下文中的2D纹理
     glGenTextures(1, texture);
     glActiveTexture(GL_TEXTURE0 + uniteLoc);
@@ -191,7 +199,7 @@ void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     ///加载纹理数据并设置多级渐远纹理
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     
     ///释放图像数据

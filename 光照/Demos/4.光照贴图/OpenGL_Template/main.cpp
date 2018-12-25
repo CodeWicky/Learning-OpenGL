@@ -44,6 +44,9 @@ int main()
     ///光源着色器程序
     Shader lightShader("Vertex.h","LightFragment.h");
     
+    unsigned int texture;
+    loadImg("container2.png", &texture,0);
+    
     ///摄像机
     camera = Camera();
     camera.setDefaultOrigin(glm::vec3(0.f,0.f,3.f));
@@ -70,8 +73,7 @@ int main()
     ourShader.setVec3f("light.specular", light.SpecularColor);
     
     ///设置材质
-    ourShader.setVec3f("material.ambient", glm::vec3(1.f,0.5f,0.31f));
-    ourShader.setVec3f("material.diffuse", glm::vec3(1.f,0.5f,0.31f));
+    ourShader.setInt("material.diffuse", 0);
     ourShader.setVec3f("material.specular", glm::vec3(0.5f,0.5f,0.5f));
     ourShader.setFloat("material.shininess", 32.0f);
     
@@ -163,18 +165,19 @@ int main()
         
         lastFrameTS = glfwGetTime();
         
-        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
-        light.updateLightColor(tmpLightColor);
+//        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
+//        light.updateLightColor(tmpLightColor);
         
-        ///设置光的属性
-        ourShader.setVec3f("light.position", light.Position);
-        ourShader.setVec3f("light.ambient", light.AmbientColor);
-        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
-        ourShader.setVec3f("light.specular", light.SpecularColor);
+//        ///设置光的属性
+//        ourShader.setVec3f("light.position", light.Position);
+//        ourShader.setVec3f("light.ambient", light.AmbientColor);
+//        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
+//        ourShader.setVec3f("light.specular", light.SpecularColor);
         
         
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
+        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, postions[i]);
@@ -251,53 +254,54 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     
     ///顶点数据
     float vertices[] = {
-        0.5,0.5,0.5,0.f,0.f,1.f,
-        0.5,-0.5,0.5,0.f,0.f,1.f,
-        -0.5,-0.5,0.5,0.f,0.f,1.f,
+        ///vertex-3 ///normal-3 ///textureCord-2
+        0.5,0.5,0.5,0.f,0.f,1.f,1.0,1.0,//1
+        0.5,-0.5,0.5,0.f,0.f,1.f,1.0,0.0,//2
+        -0.5,-0.5,0.5,0.f,0.f,1.f,0.0,0.0,//3
         
-        0.5,0.5,0.5,0.f,0.f,1.f,
-        -0.5,-0.5,0.5,0.f,0.f,1.f,
-        -0.5,0.5,0.5,0.f,0.f,1.f,
+        0.5,0.5,0.5,0.f,0.f,1.f,1.0,1.0,//1
+        -0.5,-0.5,0.5,0.f,0.f,1.f,0.0,0.0,//3
+        -0.5,0.5,0.5,0.f,0.f,1.f,0.0,1.0,//4
         
-        0.5,-0.5,0.5,1.f,0.f,0.f,
-        0.5,0.5,-0.5,1.f,0.f,0.f,
-        0.5,-0.5,-0.5,1.f,0.f,0.f,
+        0.5,-0.5,0.5,1.f,0.f,0.f,0.0,0.0,//2
+        0.5,0.5,-0.5,1.f,0.f,0.f,1.0,1.0,//5
+        0.5,-0.5,-0.5,1.f,0.f,0.f,1.0,0.0,//6
         
-        0.5,0.5,0.5,1.f,0.f,0.f,
-        0.5,-0.5,0.5,1.f,0.f,0.f,
-        0.5,0.5,-0.5,1.f,0.f,0.f,
+        0.5,0.5,0.5,1.f,0.f,0.f,0.0,1.0,//1
+        0.5,-0.5,0.5,1.f,0.f,0.f,0.0,0.0,//2
+        0.5,0.5,-0.5,1.f,0.f,0.f,1.0,1.0,//5
         
-        0.5,-0.5,-0.5,0.f,0.f,-1.f,
-        -0.5,-0.5,-0.5,0.f,0.f,-1.f,
-        -0.5,0.5,-0.5,0.f,0.f,-1.f,
+        0.5,-0.5,-0.5,0.f,0.f,-1.f,0.0,0.0,//6
+        -0.5,-0.5,-0.5,0.f,0.f,-1.f,1.0,0.0,//7
+        -0.5,0.5,-0.5,0.f,0.f,-1.f,1.0,1.0,//8
         
-        0.5,0.5,-0.5,0.f,0.f,-1.f,
-        0.5,-0.5,-0.5,0.f,0.f,-1.f,
-        -0.5,0.5,-0.5,0.f,0.f,-1.f,
+        0.5,0.5,-0.5,0.f,0.f,-1.f,0.0,1.0,//5
+        0.5,-0.5,-0.5,0.f,0.f,-1.f,0.0,0.0,//6
+        -0.5,0.5,-0.5,0.f,0.f,-1.f,1.0,1.0,//8
         
-        -0.5,-0.5,0.5,-1.f,0.f,0.f,
-        -0.5,0.5,0.5,-1.f,0.f,0.f,
-        -0.5,-0.5,-0.5,-1.f,0.f,0.f,
+        -0.5,-0.5,0.5,-1.f,0.f,0.f,1.0,0.0,//3
+        -0.5,0.5,0.5,-1.f,0.f,0.f,1.0,1.0,//4
+        -0.5,-0.5,-0.5,-1.f,0.f,0.f,0.0,0.0,//7
         
-        -0.5,0.5,0.5,-1.f,0.f,0.f,
-        -0.5,-0.5,-0.5,-1.f,0.f,0.f,
-        -0.5,0.5,-0.5,-1.f,0.f,0.f,
+        -0.5,0.5,0.5,-1.f,0.f,0.f,1.0,1.0,//4
+        -0.5,-0.5,-0.5,-1.f,0.f,0.f,0.0,0.0,//7
+        -0.5,0.5,-0.5,-1.f,0.f,0.f,0.0,1.0,//8
         
-        0.5,0.5,0.5,0.f,1.f,0.f,
-        -0.5,0.5,0.5,0.f,1.f,0.f,
-        0.5,0.5,-0.5,0.f,1.f,0.f,
+        0.5,0.5,0.5,0.f,1.f,0.f,1.0,0.0,//1
+        -0.5,0.5,0.5,0.f,1.f,0.f,0.0,0.0,//4
+        0.5,0.5,-0.5,0.f,1.f,0.f,1.0,1.0,//5
         
-        -0.5,0.5,0.5,0.f,1.f,0.f,
-        0.5,0.5,-0.5,0.f,1.f,0.f,
-        -0.5,0.5,-0.5,0.f,1.f,0.f,
+        -0.5,0.5,0.5,0.f,1.f,0.f,0.0,0.0,//4
+        0.5,0.5,-0.5,0.f,1.f,0.f,1.0,1.0,//5
+        -0.5,0.5,-0.5,0.f,1.f,0.f,0.0,1.0,//8
         
-        0.5,-0.5,0.5,0.f,-1.f,0.f,
-        0.5,-0.5,-0.5,0.f,-1.f,0.f,
-        -0.5,-0.5,-0.5,0.f,-1.f,0.f,
+        0.5,-0.5,0.5,0.f,-1.f,0.f,1.0,1.0,//2
+        0.5,-0.5,-0.5,0.f,-1.f,0.f,1.0,0.0,//6
+        -0.5,-0.5,-0.5,0.f,-1.f,0.f,0.0,0.0,//7
         
-        0.5,-0.5,0.5,0.f,-1.f,0.f,
-        -0.5,-0.5,0.5,0.f,-1.f,0.f,
-        -0.5,-0.5,-0.5,0.f,-1.f,0.f,
+        0.5,-0.5,0.5,0.f,-1.f,0.f,1.0,1.0,//2
+        -0.5,-0.5,0.5,0.f,-1.f,0.f,0.0,1.0,//3
+        -0.5,-0.5,-0.5,0.f,-1.f,0.f,0.0,0.0,//7
     };
     
     ///创建顶点数组对象
@@ -314,10 +318,12 @@ void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
     ///把顶点数组复制到顶点缓冲对象中
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     ///设置顶点属性并激活属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GL_FLOAT), (void*)(0 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(0 * sizeof(GL_FLOAT)));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,6 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,8 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GL_FLOAT)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GL_FLOAT)));
+    glEnableVertexAttribArray(2);
     
     ///解除顶点数组对象的绑定
     glBindVertexArray(0);
