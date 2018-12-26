@@ -165,18 +165,19 @@ int main()
         
         lastFrameTS = glfwGetTime();
         
-        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
-        light.updateLightColor(tmpLightColor);
+//        glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
+//        light.updateLightColor(tmpLightColor);
         
-        ///设置光的属性
-        ourShader.setVec3f("light.position", light.Position);
-        ourShader.setVec3f("light.ambient", light.AmbientColor);
-        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
-        ourShader.setVec3f("light.specular", light.SpecularColor);
+//        ///设置光的属性
+//        ourShader.setVec3f("light.position", light.Position);
+//        ourShader.setVec3f("light.ambient", light.AmbientColor);
+//        ourShader.setVec3f("light.diffuse", light.DiffuseColor);
+//        ourShader.setVec3f("light.specular", light.SpecularColor);
         
         
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 360 * factor;
+        angle = 0;
         for (int i = 0; i < 10; ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, postions[i]);
@@ -237,9 +238,9 @@ GLFWwindow* configOpenGL() {
     ///设置窗口事件更新触发的回调
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     ///设置鼠标事件回调
-    glfwSetCursorPosCallback(window, mouse_callback);
+//    glfwSetCursorPosCallback(window, mouse_callback);
     ///设置不显示鼠标
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     ///初始化GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
