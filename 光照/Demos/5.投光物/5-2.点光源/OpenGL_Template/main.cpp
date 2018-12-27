@@ -179,7 +179,7 @@ int main()
         }
         
         
-        bool changeModelAngle = true;
+        bool changeModelAngle = false;
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 0;
         if (changeModelAngle) {
