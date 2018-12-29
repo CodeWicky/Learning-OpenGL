@@ -11,6 +11,9 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 ///输出颜色
@@ -27,6 +30,7 @@ uniform vec3 viewPosition;
 uniform Material material;
 ///光源
 uniform Light light;
+
 void main()
 {
     ///环境光照
@@ -44,8 +48,13 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0),material.shininess);
     vec3 specularColor = light.specular * spec * vec3(texture(material.specular, TexCoord));
     
+    ///计算衰减系数r
+    float distance = length(light.position - fragPosition);
+    float attenuationFactor = 1.0 / (light.constant + light.linear * distance +
+                                     light.quadratic * (distance * distance));
+    
     ///颜色合成
-    FragColor = vec4((ambientColor + diffuseColor + specularColor) , 1.0);
+    FragColor = vec4((ambientColor + diffuseColor + specularColor) * attenuationFactor , 1.0);
 }
 
 

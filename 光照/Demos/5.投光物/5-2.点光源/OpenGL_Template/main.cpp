@@ -54,7 +54,7 @@ int main()
     camera.resetCamera();
     
     ///光源属性
-    light = Light(glm::vec3(1.0,1.0,1.0),glm::vec3(10.f,0.f,10.f));
+    light = Light(glm::vec3(1.0,1.0,1.0),glm::vec3(0.f,0.f,0.f));
     
     ///配置模型VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
@@ -72,6 +72,11 @@ int main()
     ourShader.setVec3f("light.ambient", light.AmbientColor);
     ourShader.setVec3f("light.diffuse", light.DiffuseColor);
     ourShader.setVec3f("light.specular", light.SpecularColor);
+    
+    ///设置衰减
+    ourShader.setFloat("light.constant", 1.0f);
+    ourShader.setFloat("light.linear", 0.09f);
+    ourShader.setFloat("light.quadratic", 0.032f);
     
     ///设置材质
     ourShader.setInt("material.diffuse", 0);
