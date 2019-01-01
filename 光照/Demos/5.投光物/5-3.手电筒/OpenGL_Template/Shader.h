@@ -24,7 +24,11 @@ class Shader {
     ///着色器程序ID
     unsigned int ID;
     ///构造器读取着色器
-    Shader(const GLchar * vertexPath,const GLchar * fragmentPath) {
+    Shader(const GLchar * vertexPath = "",const GLchar * fragmentPath = "") {
+        if (strcmp(vertexPath, "") == 0 || strcmp(fragmentPath, "") == 0) {
+            return;
+        }
+        
         std::string vertexCode;
         std::string fragmentCode;
         std::ifstream vShaderFile;
