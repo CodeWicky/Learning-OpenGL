@@ -75,6 +75,7 @@ int main()
     ourShader.setVec3f("light.position", camera.Position);
     ourShader.setVec3f("light.direction", camera.Front);
     ourShader.setFloat("light.cutOff",   glm::cos(glm::radians(12.5f)));
+    ourShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
     ourShader.setVec3f("light.ambient", light.AmbientColor);
     ourShader.setVec3f("light.diffuse", light.DiffuseColor);
     ourShader.setVec3f("light.specular", light.SpecularColor);
@@ -499,6 +500,9 @@ void processInput(GLFWwindow *window)
         camera.resetCamera();
         fov = 45.0;
         jumping = false;
+        ///更新光的角度
+        shader.use();
+        shader.setVec3f("light.direction", camera.Front);
     }
     
     ///更新光的位置
