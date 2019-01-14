@@ -35,8 +35,13 @@ uniform Material material;
 uniform Light light;
 
 
-///计算单向光的光照颜色（光源、物体材质、观察点）
+///计算定向光的光照颜色（光源、物体材质、观察点）
 vec3 CalculateDirectionLight(Light aLight,Material aMaterial,vec3 viewPos);
+///计算点光源的光照颜色（光源、物体材质、观察点）
+vec3 CalculatePointLight(Light aLight,Material aMaterial,vec3 viewPos);
+///计算聚光光源的光照颜色（光源、物体材质、观察点）
+vec3 CalculateSpotLight(Light aLight,Material aMaterial,vec3 viewPos);
+
 
 void main()
 {
@@ -65,13 +70,66 @@ void main()
 //    float spec = pow(max(dot(viewDir, reflectDir), 0.0),material.shininess);
 //    vec3 specularColor = light.specular * spec * vec3(texture(material.specular, TexCoord));
     
-    vec3 DirL = CalculateDirectionLight(light,material,viewPosition);
+    vec3 DirL = CalculatePointLight(light,material,viewPosition);
     
     ///颜色合成
     FragColor = vec4(DirL , 1.0);
 }
 
+///定向光源
 vec3 CalculateDirectionLight(Light aLight,Material aMaterial,vec3 viewPos) {
+    ///环境光照
+    vec3 ambientColor = aLight.ambient * vec3(texture(aMaterial.diffuse, TexCoord));
+    
+    ///计算到顶点光线方向
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(-aLight.direction);
+    
+    ///计算衰减系数r
+    float distance = length(aLight.position - fragPosition);
+    float attenuationFactor = 1.0 / (aLight.constant + aLight.linear * distance +
+                                     aLight.quadratic * (distance * distance));
+    
+    ///漫反射光照
+    float factor = max(dot(norm,lightDir),0.0);
+    vec3 diffuseColor = aLight.diffuse * factor * vec3(texture(aMaterial.diffuse, TexCoord));
+    
+    ///镜面反射光照
+    vec3 reflectDir = reflect(-lightDir, norm);
+    vec3 viewDir = normalize(viewPos - fragPosition);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0),aMaterial.shininess);
+    vec3 specularColor = aLight.specular * spec * vec3(texture(aMaterial.specular, TexCoord));
+    return (ambientColor + diffuseColor + specularColor) * attenuationFactor;
+}
+
+///点光源
+vec3 CalculatePointLight(Light aLight,Material aMaterial,vec3 viewPos) {
+    vec3 ambientColor = aLight.ambient * vec3(texture(aMaterial.diffuse, TexCoord));
+    
+    ///计算到顶点光线方向
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(aLight.position - fragPosition);
+    
+    ///计算衰减系数r
+    float distance = length(aLight.position - fragPosition);
+    float attenuationFactor = 1.0 / (aLight.constant + aLight.linear * distance +
+                                     aLight.quadratic * (distance * distance));
+    
+    ///漫反射光照
+    float factor = max(dot(norm,lightDir),0.0);
+    vec3 diffuseColor = aLight.diffuse * factor * vec3(texture(aMaterial.diffuse, TexCoord));
+    
+    ///镜面反射光照
+    vec3 reflectDir = reflect(-lightDir, norm);
+    vec3 viewDir = normalize(viewPos - fragPosition);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0),aMaterial.shininess);
+    vec3 specularColor = aLight.specular * spec * vec3(texture(aMaterial.specular, TexCoord));
+    return (ambientColor + diffuseColor + specularColor) * attenuationFactor;
+}
+
+
+///聚光光源
+vec3 CalculateSpotLight(Light aLight,Material aMaterial,vec3 viewPos) {
     ///环境光照
     vec3 ambientColor = aLight.ambient * vec3(texture(aMaterial.diffuse, TexCoord));
     
@@ -84,6 +142,7 @@ vec3 CalculateDirectionLight(Light aLight,Material aMaterial,vec3 viewPos) {
     float attenuationFactor = 1.0 / (aLight.constant + aLight.linear * distance +
                                      aLight.quadratic * (distance * distance));
     
+    ///计算柔化系数
     float theta = dot(lightDir, normalize(-aLight.direction));
     float smoothFactor = clamp((theta - aLight.outerCutOff)/(aLight.cutOff - aLight.outerCutOff),0.0,1.0);
     
@@ -98,13 +157,5 @@ vec3 CalculateDirectionLight(Light aLight,Material aMaterial,vec3 viewPos) {
     vec3 specularColor = aLight.specular * spec * vec3(texture(aMaterial.specular, TexCoord));
     return (ambientColor + (diffuseColor + specularColor) * smoothFactor) * attenuationFactor;
 }
-//
-//vec3 CalculatePointLight() {
-//
-//}
-//
-//vec3 CalculateSpotLight() {
-//
-//}
 
 
