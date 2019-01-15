@@ -104,6 +104,15 @@ int main()
         glm::vec3(0.f,0.f,-5.f),
     };
     
+    glm::vec3 torch_directions[] = {
+        glm::vec3(1.f,0.f,0.f),
+        glm::vec3(-1.f,0.f,0.f),
+        glm::vec3(0.f,1.f,0.f),
+        glm::vec3(0.f,-1.f,0.f),
+        glm::vec3(0.f,0.f,-1.f),
+        glm::vec3(0.f,0.f,1.f),
+    };
+    
     ///设置聚光光源初始属性（模拟手电筒）
     for (int i = 0; i < 6; ++i) {
         std::string str = "spotLights[";
@@ -119,7 +128,7 @@ int main()
         ourShader.setFloat(res + "quadratic", 0.032f);
         
         ourShader.setVec3f(res + "position", torch_positions[i]);
-        ourShader.setVec3f(res + "direction", camera.Front);
+        ourShader.setVec3f(res + "direction", torch_directions[i]);
     }
     
     ///设置材质
@@ -195,6 +204,17 @@ int main()
         ///以索引绘制光源模型
         glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         
+        for (int i = 0; i < 6; ++i) {
+            lightModel = glm::mat4(1.0f);
+            lightModel = glm::translate(lightModel, postions[i]);
+            lightModel = glm::scale(lightModel, glm::vec3(0.5,0.5,0.5));
+            
+            ///设置光源展示颜色
+            lightShader.setVec3f("lightColor", torch.LightColor);
+            lightShader.setMtx4fv("model", lightModel);
+            ///以索引绘制光源模型
+            glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
+        }
         
         ///判断是否正在跳跃，来改变摄像头位置模拟跳跃行为
         if (jumping) {
