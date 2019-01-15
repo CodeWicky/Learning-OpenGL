@@ -22,6 +22,7 @@ class Light {
 
 public:
     glm::vec3 Position;
+    glm::vec3 Direction;
     glm::vec3 LightColor;
     glm::vec3 Ambient;
     glm::vec3 AmbientColor;
@@ -30,8 +31,10 @@ public:
     glm::vec3 Specular;
     glm::vec3 SpecularColor;
     
-    Light(glm::vec3 lightColor = glm::vec3(1.0f),glm::vec3 worldPosition = glm::vec3(0.0f)) : Ambient(AMBIENT),Diffuse(DIFFUSE),Specular(SPECULAR) {
+    
+    Light(glm::vec3 lightColor = glm::vec3(1.0f),glm::vec3 worldPosition = glm::vec3(0.0f),glm::vec3 lightDirection = glm::vec3(-1.0,-1.0,0.0)) : Ambient(AMBIENT),Diffuse(DIFFUSE),Specular(SPECULAR) {
         Position = worldPosition;
+        Direction = lightDirection;
         updateLightColor(lightColor);
     }
     

@@ -19,6 +19,8 @@ struct Light {
     float quadratic;
 };
 
+#define NR_POINT_LIGHTS 6
+
 ///输出颜色
 out vec4 FragColor;
 ///纹理坐标
@@ -32,7 +34,10 @@ uniform vec3 viewPosition;
 ///材质
 uniform Material material;
 ///光源
-uniform Light light;
+uniform Light pointLight;
+uniform Light directionLight;
+uniform Light spotLights[NR_POINT_LIGHTS];
+
 
 
 ///计算定向光的光照颜色（光源、物体材质、观察点）
@@ -70,8 +75,8 @@ void main()
 //    float spec = pow(max(dot(viewDir, reflectDir), 0.0),material.shininess);
 //    vec3 specularColor = light.specular * spec * vec3(texture(material.specular, TexCoord));
     
-    vec3 DirL = CalculatePointLight(light,material,viewPosition);
-    
+    vec3 DirL = CalculatePointLight(pointLight,material,viewPosition);
+    DirL += CalculateDirectionLight(directionLight,material,viewPosition);
     ///颜色合成
     FragColor = vec4(DirL , 1.0);
 }

@@ -90,11 +90,6 @@ int main()
     ourShader.setInt("material.specular", 1);
     ourShader.setFloat("material.shininess", 32.0f);
     
-//    ///设置光源着色器相关参数
-//    lightShader.use();
-//    ///设置光源展示颜色
-//    lightShader.setVec3f("lightColor", glm::vec3(1.f,0.75f,0.f));
-    
     ///模型偏移量数组
     glm::vec3 postions[] = {
         glm::vec3(0.0,0.0,0.0),
