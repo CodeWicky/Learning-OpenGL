@@ -38,8 +38,6 @@ uniform Light pointLight;
 uniform Light directionLight;
 uniform Light spotLights[NR_POINT_LIGHTS];
 
-
-
 ///计算定向光的光照颜色（光源、物体材质、观察点）
 vec3 CalculateDirectionLight(Light aLight,Material aMaterial,vec3 viewPos);
 ///计算点光源的光照颜色（光源、物体材质、观察点）
@@ -47,38 +45,17 @@ vec3 CalculatePointLight(Light aLight,Material aMaterial,vec3 viewPos);
 ///计算聚光光源的光照颜色（光源、物体材质、观察点）
 vec3 CalculateSpotLight(Light aLight,Material aMaterial,vec3 viewPos);
 
-
 void main()
 {
-//    ///环境光照
-//    vec3 ambientColor = light.ambient * vec3(texture(material.diffuse, TexCoord));
-//
-//    ///计算到顶点光线方向
-//    vec3 norm = normalize(normal);
-//    vec3 lightDir = normalize(light.position - fragPosition);
-//
-//    ///计算衰减系数r
-//    float distance = length(light.position - fragPosition);
-//    float attenuationFactor = 1.0 / (light.constant + light.linear * distance +
-//                                     light.quadratic * (distance * distance));
-//
-//    float theta = dot(lightDir, normalize(-light.direction));
-//    float smoothFactor = clamp((theta - light.outerCutOff)/(light.cutOff - light.outerCutOff),0.0,1.0);
-//
-//    ///漫反射光照
-//    float factor = max(dot(norm,lightDir),0.0);
-//    vec3 diffuseColor = light.diffuse * factor * vec3(texture(material.diffuse, TexCoord));
-//
-//    ///镜面反射光照
-//    vec3 reflectDir = reflect(-lightDir, norm);
-//    vec3 viewDir = normalize(viewPosition - fragPosition);
-//    float spec = pow(max(dot(viewDir, reflectDir), 0.0),material.shininess);
-//    vec3 specularColor = light.specular * spec * vec3(texture(material.specular, TexCoord));
-    
+    ///颜色合成并叠加
     vec3 DirL = CalculatePointLight(pointLight,material,viewPosition);
     DirL += CalculateDirectionLight(directionLight,material,viewPosition);
+    for (int i = 0; i < NR_POINT_LIGHTS; ++i) {
+        DirL += CalculateSpotLight(spotLights[i],material,viewPosition);
+    }
+    
     ///颜色合成
-    FragColor = vec4(DirL , 1.0);
+    FragColor = vec4(DirL,1.0);
 }
 
 ///定向光源
@@ -147,7 +124,6 @@ vec3 CalculateSpotLight(Light aLight,Material aMaterial,vec3 viewPos) {
     float attenuationFactor = 1.0 / (aLight.constant + aLight.linear * distance +
                                      aLight.quadratic * (distance * distance));
     
-    ///计算柔化系数
     float theta = dot(lightDir, normalize(-aLight.direction));
     float smoothFactor = clamp((theta - aLight.outerCutOff)/(aLight.cutOff - aLight.outerCutOff),0.0,1.0);
     
@@ -157,9 +133,11 @@ vec3 CalculateSpotLight(Light aLight,Material aMaterial,vec3 viewPos) {
     
     ///镜面反射光照
     vec3 reflectDir = reflect(-lightDir, norm);
-    vec3 viewDir = normalize(viewPos - fragPosition);
+    vec3 viewDir = normalize(viewPosition - fragPosition);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0),aMaterial.shininess);
     vec3 specularColor = aLight.specular * spec * vec3(texture(aMaterial.specular, TexCoord));
+    
+    ///颜色合成
     return (ambientColor + (diffuseColor + specularColor) * smoothFactor) * attenuationFactor;
 }
 

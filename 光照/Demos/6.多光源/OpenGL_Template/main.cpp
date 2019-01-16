@@ -32,15 +32,14 @@ float lastCursorX = 0;
 float lastCursorY = 0;
 float fov = 45.f;
 Camera camera;
-Light sun;
+Light moon;
 Light lamp;
 Light torch;
 Shader shader;
 
-
-
 int main()
 {
+    ///配置GL的window及视口
     GLFWwindow * window = configOpenGL();
     
     glEnable(GL_DEPTH_TEST);
@@ -60,10 +59,9 @@ int main()
     camera.resetCamera();
     
     ///光源属性
-    sun = Light(glm::vec3(1.f,1.f,0.95f),glm::vec3(10.f,10.f,10.f),glm::vec3(-1.0,-1.0,-1.0));
-    lamp = Light(glm::vec3(0.f,1.f,1.f),glm::vec3(0.f,0.f,-2.f));
-    torch = Light(glm::vec3(0.f,0.f,1.f));
-    
+    moon = Light(glm::vec3(1.0,0.965,0.56),glm::vec3(10.f,10.f,10.f),glm::vec3(-1.0,-1.0,-1.0));
+    lamp = Light(glm::vec3(0.961f,1.f,0.98f),glm::vec3(0.f,0.f,-2.f));
+    torch = Light(glm::vec3(1.f,0.412f,0.706f));
     ///配置模型VAO
     unsigned int ToyVAO,ToyVBO,ToyEBO;
     configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
@@ -76,15 +74,15 @@ int main()
     ourShader.use();
     
     ///设置光的属性
-    ///设置定向光源初始属性（模拟阳光）
-    ourShader.setVec3f("directionLight.direction", sun.Direction);
-    ourShader.setVec3f("directionLight.ambient", sun.AmbientColor);
-    ourShader.setVec3f("directionLight.diffuse", sun.DiffuseColor);
-    ourShader.setVec3f("directionLight.specular", sun.SpecularColor);
+    ///设置定向光源初始属性（模拟月光）
+    ourShader.setVec3f("directionLight.direction", moon.Direction);
+    ourShader.setVec3f("directionLight.ambient", moon.AmbientColor);
+    ourShader.setVec3f("directionLight.diffuse", moon.DiffuseColor);
+    ourShader.setVec3f("directionLight.specular", moon.SpecularColor);
     ourShader.setFloat("directionLight.constant", 1.0f);
     ourShader.setFloat("directionLight.linear", 0.0f);
     ourShader.setFloat("directionLight.quadratic", 0.0f);
-    
+
     ///设置点光源初始属性（模拟灯泡）
     ourShader.setVec3f("pointLight.position", lamp.Position);
     ourShader.setVec3f("pointLight.ambient", lamp.AmbientColor);
@@ -96,14 +94,14 @@ int main()
     
     ///torch Positions
     glm::vec3 torch_positions[] = {
-        glm::vec3(-5.f,0.f,-2.f),
-        glm::vec3(5.f,0.f,-2.f),
-        glm::vec3(0.f,-5.f,-2.f),
-        glm::vec3(0.f,5.f,-2.f),
-        glm::vec3(0.f,0.f,1.f),
-        glm::vec3(0.f,0.f,-5.f),
+        glm::vec3(-6.f,0.f,-2.f),
+        glm::vec3(6.f,0.f,-2.f),
+        glm::vec3(0.f,-6.f,-2.f),
+        glm::vec3(0.f,6.f,-2.f),
+        glm::vec3(0.f,0.f,2.f),
+        glm::vec3(0.f,0.f,-6.f),
     };
-    
+    ///torch Direction
     glm::vec3 torch_directions[] = {
         glm::vec3(1.f,0.f,0.f),
         glm::vec3(-1.f,0.f,0.f),
@@ -112,12 +110,12 @@ int main()
         glm::vec3(0.f,0.f,-1.f),
         glm::vec3(0.f,0.f,1.f),
     };
-    
+
     ///设置聚光光源初始属性（模拟手电筒）
     for (int i = 0; i < 6; ++i) {
         std::string str = "spotLights[";
         std::string res = str + std::to_string(i) + "].";
-        
+
         ourShader.setFloat(res + "cutOff", glm::cos(glm::radians(12.5f)));
         ourShader.setFloat(res + "outerCutOff", glm::cos(glm::radians(17.5f)));
         ourShader.setVec3f(res + "ambient", torch.AmbientColor);
@@ -126,7 +124,7 @@ int main()
         ourShader.setFloat(res + "constant", 1.0f);
         ourShader.setFloat(res + "linear", 0.09f);
         ourShader.setFloat(res + "quadratic", 0.032f);
-        
+
         ourShader.setVec3f(res + "position", torch_positions[i]);
         ourShader.setVec3f(res + "direction", torch_directions[i]);
     }
@@ -169,50 +167,42 @@ int main()
         processInput(window);
         
         ///设置清屏颜色
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         ///开始绘制光源
         lightShader.use();
         ///设置光源展示颜色
-        lightShader.setVec3f("lightColor", glm::vec3(1.0,0.75,0.0));
+        lightShader.setVec3f("lightColor", moon.LightColor);
         ///绑定定点数组对象
         glBindVertexArray(LightVAO);
-        
+
         ///绘制顶部太阳光源（定向光源）
-        ///设置光源的观察矩阵
         glm::mat4 lightView = camera.getViewMatrix();
         lightShader.setMtx4fv("view", lightView);
-        ///设置光源的裁剪矩阵
         glm::mat4 lightProjection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
         lightShader.setMtx4fv("projection", lightProjection);
-        ///设置光源的模型矩阵
         glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::translate(lightModel, sun.Position);
+        lightModel = glm::translate(lightModel, moon.Position);
         lightShader.setMtx4fv("model", lightModel);
-        ///以索引绘制光源模型
         glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
-        
+
         ///设置灯泡光源（点光源）
         lightModel = glm::mat4(1.0f);
         lightModel = glm::translate(lightModel, glm::vec3(0.0,0.0,-2.0));
         lightModel = glm::scale(lightModel, glm::vec3(0.5,0.5,0.5));
-        ///设置光源展示颜色
         lightShader.setVec3f("lightColor", lamp.LightColor);
         lightShader.setMtx4fv("model", lightModel);
-        ///以索引绘制光源模型
         glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         
+        ///设置手电筒光源（聚光光源）
         for (int i = 0; i < 6; ++i) {
             lightModel = glm::mat4(1.0f);
-            lightModel = glm::translate(lightModel, postions[i]);
-            lightModel = glm::scale(lightModel, glm::vec3(0.5,0.5,0.5));
-            
-            ///设置光源展示颜色
+            lightModel = glm::translate(lightModel, torch_positions[i]);
+            lightModel = glm::scale(lightModel, glm::vec3(0.25,0.25,0.25));
             lightShader.setVec3f("lightColor", torch.LightColor);
             lightShader.setMtx4fv("model", lightModel);
-            ///以索引绘制光源模型
             glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         }
         
@@ -227,36 +217,36 @@ int main()
 //                camera.Position *= glm::vec3(1.f,0.f,1.f);
             }
         }
-        
+
         ///开始绘制模型
         ourShader.use();
         glBindVertexArray(ToyVAO);
-        
+
         ///设置观察点位置
         glm::vec3 viewPos = camera.Position;
         ourShader.setVec3f("viewPosition", viewPos);
-        
+
         ///设置转换矩阵
         glm::mat4 view = camera.getViewMatrix();
         ourShader.setMtx4fv("view", view);
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)(SCR_WIDTH * 1.0 / SCR_HEIGHT), 0.1f, 100.0f);
         ourShader.setMtx4fv("projection", projection);
-        
+
         lastFrameTS = glfwGetTime();
-        
+
         bool changeLightColor = false;
         if (changeLightColor) {
-//            glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
-//            light.updateLightColor(tmpLightColor);
-//
-//            ///设置光的属性
-//            ourShader.setVec3f("light.position", light.Position);
-//            ourShader.setVec3f("light.ambient", light.AmbientColor);
-//            ourShader.setVec3f("light.diffuse", light.DiffuseColor);
-//            ourShader.setVec3f("light.specular", light.SpecularColor);
+            glm::vec3 tmpLightColor = glm::vec3(0.5 * sin(lastFrameTS * 2.0f) + 0.5,0.5 * sin(lastFrameTS * 0.7) + 0.5,0.5 * sin(lastFrameTS * 1.3) + 0.5);
+            moon.updateLightColor(tmpLightColor);
+
+            ///设置光的属性
+            ourShader.setVec3f("directionLight.position", moon.Position);
+            ourShader.setVec3f("directionLight.ambient", moon.AmbientColor);
+            ourShader.setVec3f("directionLight.diffuse", moon.DiffuseColor);
+            ourShader.setVec3f("directionLight.specular", moon.SpecularColor);
         }
-        
-        
+
+
         bool changeModelAngle = false;
         float factor = sin(lastFrameTS) * 0.5 + 0.5;
         float angle = 0;
@@ -566,14 +556,7 @@ void processInput(GLFWwindow *window)
         camera.resetCamera();
         fov = 45.0;
         jumping = false;
-        ///更新光的角度
-        shader.use();
-        shader.setVec3f("light.direction", camera.Front);
     }
-    
-    ///更新光的位置
-    shader.use();
-    shader.setVec3f("light.position", camera.Position);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -606,10 +589,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     camera.setPitch(pitch);
     camera.setYaw(yaw);
     camera.updateCameraVectors();
-    
-    ///更新光的方向
-    shader.use();
-    shader.setVec3f("light.direction", camera.Front);
 }
 
 ///窗口事件更新回调
