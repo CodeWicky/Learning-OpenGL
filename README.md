@@ -21,4 +21,6 @@
 	- 2.3 [材质](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/3.%E6%9D%90%E8%B4%A8.md)
 	- 2.4 [光照贴图](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/4.%E5%85%89%E7%85%A7%E8%B4%B4%E5%9B%BE.md)
 	- 2.5 [投光物](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/5.%E6%8A%95%E5%85%89%E7%89%A9.md)
+	- 2.6 [多光源](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/6.%E5%A4%9A%E5%85%89%E6%BA%90.md)
+	- 2.7 [复习](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/7.%E5%A4%8D%E4%B9%A0.md)
 	
