@@ -20,7 +20,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 class Shader {
-    public:
+public:
     ///着色器程序ID
     unsigned int ID;
     ///构造器读取着色器

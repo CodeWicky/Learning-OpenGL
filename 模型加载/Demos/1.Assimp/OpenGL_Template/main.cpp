@@ -1,6 +1,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Mesh.h"
 #include <math.h>
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
