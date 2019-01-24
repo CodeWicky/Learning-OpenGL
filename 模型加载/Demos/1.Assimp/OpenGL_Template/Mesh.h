@@ -49,7 +49,11 @@ public:
         setupMesh();
     }
     
-    
+    Mesh(vector<Mesh_Vertex> aVertices, vector<unsigned int> aIndices) {
+        vertices = aVertices;
+        indices = aIndices;
+        setupMesh();
+    }
     
     void Draw(Shader shader) {
         ///用四个变量来记录不同纹理类型已经存在的个数，这样做的好处是可以在循环中为不同类型的问题自动赋值给片段着色器，故片段着色器中不同纹理的命名应遵循如下命名规则，如第一个漫反射纹理应为：texture_diffuse1

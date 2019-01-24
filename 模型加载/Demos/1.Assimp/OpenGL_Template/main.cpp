@@ -385,9 +385,7 @@ void configMesh (Mesh * mesh) {
         v.push_back(tmp);
     }
     
-    vector<Mesh_Texture> t;
-    
-    *mesh = Mesh(v, indices, t);
+    *mesh = Mesh(v, indices);
 }
 
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
