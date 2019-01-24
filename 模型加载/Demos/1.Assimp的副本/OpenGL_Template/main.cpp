@@ -67,9 +67,6 @@ int main()
     unsigned int ToyVAO,ToyVBO,ToyEBO;
     configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
     
-    
-    
-    
     ///配置灯泡VAO
     unsigned int LightVAO,LightVBO,LightEBO;
     configLight(&LightVAO,&LightVBO,&LightEBO);
@@ -327,67 +324,6 @@ GLFWwindow* configOpenGL() {
         return NULL;
     }
     return window;
-}
-
-void configMesh (Mesh * mesh) {
-    ///顶点数据
-    float vertices[] = {
-        ///vertex-3 ///normal-3 ///textureCord-2
-        0.5,0.5,0.5,0.f,0.f,1.f,1.0,1.0,//1
-        0.5,-0.5,0.5,0.f,0.f,1.f,1.0,0.0,//2
-        -0.5,-0.5,0.5,0.f,0.f,1.f,0.0,0.0,//3
-        -0.5,0.5,0.5,0.f,0.f,1.f,0.0,1.0,//4
-        0.5,-0.5,0.5,1.f,0.f,0.f,0.0,0.0,//5
-        0.5,0.5,-0.5,1.f,0.f,0.f,1.0,1.0,//6
-        0.5,-0.5,-0.5,1.f,0.f,0.f,1.0,0.0,//7
-        0.5,0.5,0.5,1.f,0.f,0.f,0.0,1.0,//8
-        0.5,-0.5,-0.5,0.f,0.f,-1.f,0.0,0.0,//9
-        -0.5,-0.5,-0.5,0.f,0.f,-1.f,1.0,0.0,//10
-        -0.5,0.5,-0.5,0.f,0.f,-1.f,1.0,1.0,//11
-        0.5,0.5,-0.5,0.f,0.f,-1.f,0.0,1.0,//12
-        -0.5,-0.5,0.5,-1.f,0.f,0.f,1.0,0.0,//13
-        -0.5,0.5,0.5,-1.f,0.f,0.f,1.0,1.0,//14
-        -0.5,-0.5,-0.5,-1.f,0.f,0.f,0.0,0.0,//15
-        -0.5,0.5,-0.5,-1.f,0.f,0.f,0.0,1.0,//16
-        0.5,0.5,0.5,0.f,1.f,0.f,1.0,0.0,//17
-        -0.5,0.5,0.5,0.f,1.f,0.f,0.0,0.0,//18
-        0.5,0.5,-0.5,0.f,1.f,0.f,1.0,1.0,//19
-        -0.5,0.5,-0.5,0.f,1.f,0.f,0.0,1.0,//20
-        0.5,-0.5,0.5,0.f,-1.f,0.f,1.0,1.0,//21
-        0.5,-0.5,-0.5,0.f,-1.f,0.f,1.0,0.0,//22
-        -0.5,-0.5,-0.5,0.f,-1.f,0.f,0.0,0.0,//23
-        -0.5,-0.5,0.5,0.f,-1.f,0.f,0.0,1.0,//24
-    };
-    
-    ///索引数据
-    vector<unsigned int> indices = {
-        0,1,2,
-        0,2,3,
-        4,5,6,
-        7,4,5,
-        8,9,10,
-        11,8,10,
-        12,13,14,
-        13,14,15,
-        16,17,18,
-        17,18,19,
-        20,21,22,
-        20,23,22,
-    };
-    
-    vector<Mesh_Vertex> v;
-    for (int i = 0; i < 24; ++i) {
-        Mesh_Vertex tmp;
-        int offset = 8 * i;
-        tmp.Position = glm::vec3(vertices[offset],vertices[offset + 1],vertices[offset + 2]);
-        tmp.Normal = glm::vec3(vertices[offset + 3],vertices[offset + 4],vertices[offset + 5]);
-        tmp.TexCoords = glm::vec2(vertices[offset + 6],vertices[offset + 7]);
-        v.push_back(tmp);
-    }
-    
-    vector<Mesh_Texture> t;
-    
-    *mesh = Mesh(v, indices, t);
 }
 
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
