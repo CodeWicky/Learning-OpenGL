@@ -329,7 +329,7 @@ GLFWwindow* configOpenGL() {
     return window;
 }
 
-void configMesh (Mesh * mesh) {
+Mesh configMesh () {
     ///顶点数据
     float vertices[] = {
         ///vertex-3 ///normal-3 ///textureCord-2
@@ -385,7 +385,7 @@ void configMesh (Mesh * mesh) {
         v.push_back(tmp);
     }
     
-    *mesh = Mesh(v, indices);
+    return Mesh(v, indices);
 }
 
 void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
