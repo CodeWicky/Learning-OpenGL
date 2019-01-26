@@ -13,8 +13,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 GLFWwindow * configOpenGL();
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
-void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void configBoxMesh (Mesh * mesh);
+void configLightMesh(Mesh * mesh);
 void finishiRenderLoop();
 float timeIntervalToLastFrame();
 
@@ -68,9 +68,8 @@ int main()
     Mesh box;
     configBoxMesh(&box);
     
-    ///配置灯泡VAO
-    unsigned int LightVAO,LightVBO,LightEBO;
-    configLight(&LightVAO,&LightVBO,&LightEBO);
+    Mesh light;
+    configLightMesh(&light);
     
     ///设置模型着色器程序相关参数
     ourShader.use();
@@ -177,8 +176,7 @@ int main()
         lightShader.use();
         ///设置光源展示颜色
         lightShader.setVec3f("lightColor", moon.LightColor);
-        ///绑定定点数组对象
-        glBindVertexArray(LightVAO);
+        
 
         ///绘制顶部太阳光源（定向光源）
         glm::mat4 lightView = camera.getViewMatrix();
@@ -188,7 +186,7 @@ int main()
         glm::mat4 lightModel = glm::mat4(1.0f);
         lightModel = glm::translate(lightModel, moon.Position);
         lightShader.setMtx4fv("model", lightModel);
-        glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
+        light.DrawWithoutConfigImage();
 
         ///设置灯泡光源（点光源）
         lightModel = glm::mat4(1.0f);
@@ -196,7 +194,7 @@ int main()
         lightModel = glm::scale(lightModel, glm::vec3(0.5,0.5,0.5));
         lightShader.setVec3f("lightColor", lamp.LightColor);
         lightShader.setMtx4fv("model", lightModel);
-        glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
+        light.DrawWithoutConfigImage();
 
         ///设置手电筒光源（聚光光源）
         for (int i = 0; i < 6; ++i) {
@@ -205,7 +203,7 @@ int main()
             lightModel = glm::scale(lightModel, glm::vec3(0.25,0.25,0.25));
             lightShader.setVec3f("lightColor", torch.LightColor);
             lightShader.setMtx4fv("model", lightModel);
-            glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
+            light.DrawWithoutConfigImage();
         }
 
         ///判断是否正在跳跃，来改变摄像头位置模拟跳跃行为
@@ -269,12 +267,10 @@ int main()
         glfwPollEvents();
     }
     
-    ///释放对象
-    glDeleteVertexArrays(1, &LightVAO);
-    glDeleteBuffers(1, &LightVBO);
-    glDeleteBuffers(1, &LightEBO);
     ///释放Box网格
     box.ReleaseMesh();
+    ///释放Light网格
+    light.ReleaseMesh();
     
     finishiRenderLoop();
     
@@ -424,67 +420,7 @@ void configLightMesh(Mesh * mesh) {
         v.push_back(tmp);
     }
     
-    
-}
-
-void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
-    ///顶点数据
-    float vertices[] = {
-        0.5,0.5,0.5,
-        0.5,-0.5,0.5,
-        -0.5,-0.5,0.5,
-        -0.5,0.5,0.5,
-        0.5,0.5,-0.5,
-        0.5,-0.5,-0.5,
-        -0.5,-0.5,-0.5,
-        -0.5,0.5,-0.5,
-    };
-    
-    ///索引数据
-    unsigned int indices[] = {
-        0,1,2,
-        0,2,3,
-        1,4,5,
-        0,1,4,
-        5,6,7,
-        4,5,7,
-        2,3,6,
-        3,6,7,
-        0,3,4,
-        3,4,7,
-        1,5,6,
-        1,2,6,
-    };
-    
-    ///创建顶点数组对象
-    glGenVertexArrays(1, VAO);
-    
-    ///创建顶点缓冲对象
-    glGenBuffers(1, VBO);
-    ///创建索引缓冲对象
-    glGenBuffers(1, EBO);
-    
-    ///绑定定点数组对象至上下文
-    glBindVertexArray(*VAO);
-    
-    ///绑定定点缓冲对象至上下文
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    ///把顶点数组复制到顶点缓冲对象中
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    ///设置顶点属性并激活属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    ///绑定索引缓冲对象至上下文
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
-    ///把索引数据复制到索引缓冲对象中
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
-    ///解除顶点数组对象的绑定
-    glBindVertexArray(0);
-    ///解除顶点缓冲对象的绑定
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    ///解除索引缓冲对象的绑定
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+    *mesh = Mesh(v, indices);
 }
 
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc) {
