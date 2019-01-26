@@ -55,6 +55,10 @@ public:
         setupMesh();
     }
     
+    Mesh() {
+        
+    }
+    
     void Draw(Shader shader) {
         ///用四个变量来记录不同纹理类型已经存在的个数，这样做的好处是可以在循环中为不同类型的问题自动赋值给片段着色器，故片段着色器中不同纹理的命名应遵循如下命名规则，如第一个漫反射纹理应为：texture_diffuse1
         for (int i = 0; i < textures.size(); ++i) {
@@ -83,6 +87,13 @@ public:
     void DrawWithoutConfigImage() {
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    
+    void ReleaseMesh() {
+        ///释放对象
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
     }
     
 private:

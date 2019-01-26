@@ -13,8 +13,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 GLFWwindow * configOpenGL();
 void loadImg(const char * path,unsigned int * texture,unsigned int uniteLoc);
-void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
 void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO);
+void configBoxMesh (Mesh * mesh);
 void finishiRenderLoop();
 float timeIntervalToLastFrame();
 
@@ -63,9 +63,10 @@ int main()
     moon = Light(glm::vec3(1.0,0.965,0.56),glm::vec3(10.f,10.f,10.f),glm::vec3(-1.0,-1.0,-1.0));
     lamp = Light(glm::vec3(0.961f,1.f,0.98f),glm::vec3(0.f,0.f,-2.f));
     torch = Light(glm::vec3(1.f,0.412f,0.706f));
-    ///配置模型VAO
-    unsigned int ToyVAO,ToyVBO,ToyEBO;
-    configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
+    
+    ///配置盒子网格
+    Mesh box;
+    configBoxMesh(&box);
     
     ///配置灯泡VAO
     unsigned int LightVAO,LightVBO,LightEBO;
@@ -171,7 +172,7 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         ///清屏
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         ///开始绘制光源
         lightShader.use();
         ///设置光源展示颜色
@@ -196,7 +197,7 @@ int main()
         lightShader.setVec3f("lightColor", lamp.LightColor);
         lightShader.setMtx4fv("model", lightModel);
         glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
-        
+
         ///设置手电筒光源（聚光光源）
         for (int i = 0; i < 6; ++i) {
             lightModel = glm::mat4(1.0f);
@@ -206,7 +207,7 @@ int main()
             lightShader.setMtx4fv("model", lightModel);
             glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
         }
-        
+
         ///判断是否正在跳跃，来改变摄像头位置模拟跳跃行为
         if (jumping) {
             float factor = timeIntervalToLastFrame();
@@ -221,7 +222,6 @@ int main()
 
         ///开始绘制模型
         ourShader.use();
-        glBindVertexArray(ToyVAO);
 
         ///设置观察点位置
         glm::vec3 viewPos = camera.Position;
@@ -259,7 +259,7 @@ int main()
             model = glm::translate(model, postions[i]);
             model = glm::rotate(model, glm::radians(angle), rotateAxis[i]);
             ourShader.setMtx4fv("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            box.DrawWithoutConfigImage();
         }
         
         
@@ -270,9 +270,11 @@ int main()
     }
     
     ///释放对象
-    glDeleteVertexArrays(1, &ToyVAO);
-    glDeleteBuffers(1, &ToyVBO);
-    glDeleteBuffers(1, &ToyEBO);
+    glDeleteVertexArrays(1, &LightVAO);
+    glDeleteBuffers(1, &LightVBO);
+    glDeleteBuffers(1, &LightEBO);
+    ///释放Box网格
+    box.ReleaseMesh();
     
     finishiRenderLoop();
     
@@ -326,7 +328,7 @@ GLFWwindow* configOpenGL() {
     return window;
 }
 
-Mesh configMesh () {
+void configBoxMesh (Mesh * mesh) {
     ///顶点数据
     float vertices[] = {
         ///vertex-3 ///normal-3 ///textureCord-2
@@ -382,88 +384,47 @@ Mesh configMesh () {
         v.push_back(tmp);
     }
     
-    return Mesh(v, indices);
+    *mesh = Mesh(v, indices);
 }
 
-void configVAO(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
-    
+void configLightMesh(Mesh * mesh) {
     ///顶点数据
     float vertices[] = {
-        ///vertex-3 ///normal-3 ///textureCord-2
-        0.5,0.5,0.5,0.f,0.f,1.f,1.0,1.0,//1
-        0.5,-0.5,0.5,0.f,0.f,1.f,1.0,0.0,//2
-        -0.5,-0.5,0.5,0.f,0.f,1.f,0.0,0.0,//3
-        
-        0.5,0.5,0.5,0.f,0.f,1.f,1.0,1.0,//1
-        -0.5,-0.5,0.5,0.f,0.f,1.f,0.0,0.0,//3
-        -0.5,0.5,0.5,0.f,0.f,1.f,0.0,1.0,//4
-        
-        0.5,-0.5,0.5,1.f,0.f,0.f,0.0,0.0,//2
-        0.5,0.5,-0.5,1.f,0.f,0.f,1.0,1.0,//5
-        0.5,-0.5,-0.5,1.f,0.f,0.f,1.0,0.0,//6
-        
-        0.5,0.5,0.5,1.f,0.f,0.f,0.0,1.0,//1
-        0.5,-0.5,0.5,1.f,0.f,0.f,0.0,0.0,//2
-        0.5,0.5,-0.5,1.f,0.f,0.f,1.0,1.0,//5
-        
-        0.5,-0.5,-0.5,0.f,0.f,-1.f,0.0,0.0,//6
-        -0.5,-0.5,-0.5,0.f,0.f,-1.f,1.0,0.0,//7
-        -0.5,0.5,-0.5,0.f,0.f,-1.f,1.0,1.0,//8
-        
-        0.5,0.5,-0.5,0.f,0.f,-1.f,0.0,1.0,//5
-        0.5,-0.5,-0.5,0.f,0.f,-1.f,0.0,0.0,//6
-        -0.5,0.5,-0.5,0.f,0.f,-1.f,1.0,1.0,//8
-        
-        -0.5,-0.5,0.5,-1.f,0.f,0.f,1.0,0.0,//3
-        -0.5,0.5,0.5,-1.f,0.f,0.f,1.0,1.0,//4
-        -0.5,-0.5,-0.5,-1.f,0.f,0.f,0.0,0.0,//7
-        
-        -0.5,0.5,0.5,-1.f,0.f,0.f,1.0,1.0,//4
-        -0.5,-0.5,-0.5,-1.f,0.f,0.f,0.0,0.0,//7
-        -0.5,0.5,-0.5,-1.f,0.f,0.f,0.0,1.0,//8
-        
-        0.5,0.5,0.5,0.f,1.f,0.f,1.0,0.0,//1
-        -0.5,0.5,0.5,0.f,1.f,0.f,0.0,0.0,//4
-        0.5,0.5,-0.5,0.f,1.f,0.f,1.0,1.0,//5
-        
-        -0.5,0.5,0.5,0.f,1.f,0.f,0.0,0.0,//4
-        0.5,0.5,-0.5,0.f,1.f,0.f,1.0,1.0,//5
-        -0.5,0.5,-0.5,0.f,1.f,0.f,0.0,1.0,//8
-        
-        0.5,-0.5,0.5,0.f,-1.f,0.f,1.0,1.0,//2
-        0.5,-0.5,-0.5,0.f,-1.f,0.f,1.0,0.0,//6
-        -0.5,-0.5,-0.5,0.f,-1.f,0.f,0.0,0.0,//7
-        
-        0.5,-0.5,0.5,0.f,-1.f,0.f,1.0,1.0,//2
-        -0.5,-0.5,0.5,0.f,-1.f,0.f,0.0,1.0,//3
-        -0.5,-0.5,-0.5,0.f,-1.f,0.f,0.0,0.0,//7
+        0.5,0.5,0.5,
+        0.5,-0.5,0.5,
+        -0.5,-0.5,0.5,
+        -0.5,0.5,0.5,
+        0.5,0.5,-0.5,
+        0.5,-0.5,-0.5,
+        -0.5,-0.5,-0.5,
+        -0.5,0.5,-0.5,
     };
     
-    ///创建顶点数组对象
-    glGenVertexArrays(1, VAO);
+    ///索引数据
+    vector<unsigned int> indices = {
+        0,1,2,
+        0,2,3,
+        1,4,5,
+        0,1,4,
+        5,6,7,
+        4,5,7,
+        2,3,6,
+        3,6,7,
+        0,3,4,
+        3,4,7,
+        1,5,6,
+        1,2,6,
+    };
     
-    ///创建顶点缓冲对象
-    glGenBuffers(1, VBO);
+    vector<Mesh_Vertex> v;
+    for (int i = 0; i < 8; ++i) {
+        Mesh_Vertex tmp;
+        int offset = 3 * i;
+        tmp.Position = glm::vec3(vertices[offset],vertices[offset + 1],vertices[offset + 2]);
+        v.push_back(tmp);
+    }
     
-    ///绑定定点数组对象至上下文
-    glBindVertexArray(*VAO);
     
-    ///绑定定点缓冲对象至上下文
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    ///把顶点数组复制到顶点缓冲对象中
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    ///设置顶点属性并激活属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void*)(0 * sizeof(GL_FLOAT)));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,8 * sizeof(GL_FLOAT), (void*)(3 * sizeof(GL_FLOAT)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,8 * sizeof(GL_FLOAT), (void*)(6 * sizeof(GL_FLOAT)));
-    glEnableVertexAttribArray(2);
-    
-    ///解除顶点数组对象的绑定
-    glBindVertexArray(0);
-    ///解除顶点缓冲对象的绑定
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void configLight(unsigned int * VAO,unsigned int * VBO,unsigned int * EBO) {
