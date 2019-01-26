@@ -67,9 +67,6 @@ int main()
     unsigned int ToyVAO,ToyVBO,ToyEBO;
     configVAO(&ToyVAO,&ToyVBO,&ToyEBO);
     
-    
-    
-    
     ///配置灯泡VAO
     unsigned int LightVAO,LightVBO,LightEBO;
     configLight(&LightVAO,&LightVBO,&LightEBO);
