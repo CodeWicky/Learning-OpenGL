@@ -24,6 +24,7 @@
 	- 2.6 [多光源](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/6.%E5%A4%9A%E5%85%89%E6%BA%90.md)
 	- 2.7 [复习](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E5%85%89%E7%85%A7/7.%E5%A4%8D%E4%B9%A0.md)
 - 3 [模型加载](https://github.com/CodeWicky/Learning-OpenGL/tree/master/%E6%A8%A1%E5%9E%8B%E5%8A%A0%E8%BD%BD)
+	- 3.1 [Assimp](https://github.com/CodeWicky/Learning-OpenGL/blob/master/%E6%A8%A1%E5%9E%8B%E5%8A%A0%E8%BD%BD/1.Assimp.md)
 
 
 
