@@ -50,10 +50,6 @@ int main()
     ///光源着色器程序
     Shader lightShader("Vertex.h","LightFragment.h");
     
-    ///加载光照贴图
-    unsigned int texture,tex_specular;
-    loadImg("container2.png", &texture,0);
-    loadImg("container2_specular.png", &tex_specular, 1);
     ///摄像机
     camera = Camera();
     camera.setDefaultOrigin(glm::vec3(0.f,0.f,3.f));
@@ -131,8 +127,8 @@ int main()
     }
     
     ///设置材质
-    ourShader.setInt("material.diffuse", 0);
-    ourShader.setInt("material.specular", 1);
+//    ourShader.setInt("material.diffuse", 0);
+//    ourShader.setInt("material.specular", 1);
     ourShader.setFloat("material.shininess", 32.0f);
     
     ///模型偏移量数组
@@ -257,7 +253,7 @@ int main()
             model = glm::translate(model, postions[i]);
             model = glm::rotate(model, glm::radians(angle), rotateAxis[i]);
             ourShader.setMtx4fv("model", model);
-            box.DrawWithoutConfigImage();
+            box.Draw(shader);
         }
         
         
@@ -325,6 +321,7 @@ GLFWwindow* configOpenGL() {
 }
 
 void configBoxMesh (Mesh * mesh) {
+    
     ///顶点数据
     float vertices[] = {
         ///vertex-3 ///normal-3 ///textureCord-2
@@ -355,7 +352,7 @@ void configBoxMesh (Mesh * mesh) {
     };
     
     ///索引数据
-    vector<unsigned int> indices = {
+    vector<unsigned int> i = {
         0,1,2,
         0,2,3,
         4,5,6,
@@ -380,7 +377,23 @@ void configBoxMesh (Mesh * mesh) {
         v.push_back(tmp);
     }
     
-    *mesh = Mesh(v, indices);
+    ///加载光照贴图
+    unsigned int texture,tex_specular;
+    loadImg("container2.png", &texture,0);
+    loadImg("container2_specular.png", &tex_specular, 1);
+    vector<Mesh_Texture> t;
+    
+    Mesh_Texture diffuse;
+    diffuse.t_id = texture;
+    diffuse.type = "diffuse";
+    t.push_back(diffuse);
+    
+    Mesh_Texture specular;
+    specular.t_id = tex_specular;
+    specular.type = "specular";
+    t.push_back(specular);
+    
+    *mesh = Mesh(v, i, t);
 }
 
 void configLightMesh(Mesh * mesh) {
