@@ -38,6 +38,7 @@
 		9B25E94B21889EB600F5DC49 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		9B2DA55721D28DF5008F1A9A /* container2_specular.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = container2_specular.png; sourceTree = "<group>"; };
 		9B44B48321CF678900913032 /* Light.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Light.h; sourceTree = "<group>"; };
+		9B6ED6782201F54E003BB1EA /* Model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		9B7282A721F5B935006DC62E /* IOSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = IOSystem.hpp; sourceTree = "<group>"; };
 		9B7282A821F5B935006DC62E /* Logger.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Logger.hpp; sourceTree = "<group>"; };
 		9B7282A921F5B935006DC62E /* IOStream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = IOStream.hpp; sourceTree = "<group>"; };
@@ -1049,6 +1050,7 @@
 				9B25E93D218599B400F5DC49 /* Shader.h */,
 				9B25E93F2185A0F500F5DC49 /* Vertex.h */,
 				9B72845D21F5BFF7006DC62E /* Mesh.h */,
+				9B6ED6782201F54E003BB1EA /* Model.h */,
 				9B25E9422185A29100F5DC49 /* Fragment.h */,
 				9BA8E3DC21A57F35006585E3 /* LightFragment.h */,
 			);

@@ -6,6 +6,9 @@
 //  Copyright © 2019 Wicky. All rights reserved.
 //
 
+#ifndef Mesh_h
+#define Mesh_h
+
 ///system framework
 #include <vector>
 
@@ -44,6 +47,10 @@ public:
         indices = aIndices;
         textures = aTextures;
         setupMesh();
+    }
+    
+    Mesh() {
+        
     }
     
     void Draw(Shader shader) {
@@ -103,5 +110,7 @@ private:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
     }
 };
+
+#endif
 
 
