@@ -67,7 +67,7 @@ private:
         
         for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Mesh_Vertex vertex;
-            // 处理顶点位置、法线和纹理坐标
+            ///处理顶点位置、法线和纹理坐标
             glm::vec3 vector;
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
@@ -90,7 +90,7 @@ private:
             
             vertices.push_back(vertex);
         }
-        // 处理索引
+        ///处理索引
         for(unsigned int i = 0; i < mesh->mNumFaces; i++) {
             aiFace face = mesh->mFaces[i];
             for(unsigned int j = 0; j < face.mNumIndices; j++) {
@@ -98,7 +98,7 @@ private:
             }
         }
         
-        // 处理材质
+        ///处理材质
         if(mesh->mMaterialIndex >= 0) {
             aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
             vector<Mesh_Texture> diffuseMaps = loadMaterialTextures(material,
