@@ -5,8 +5,10 @@
 #include "Model.h"
 #include <math.h>
 #include <iostream>
+#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#endif
 
 ///函数声明
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
