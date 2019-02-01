@@ -20,6 +20,9 @@
 
 class Model {
 public:
+    
+    vector<Mesh_Texture> loadedTexture;
+    
     Model(string modelPath = "") {
         if (modelPath.size() == 0) {
             return;
@@ -116,6 +119,8 @@ private:
         vector<Mesh_Texture> textures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
+            
+            
             aiString str;
             mat->GetTexture(type, i, &str);
             Mesh_Texture texture;

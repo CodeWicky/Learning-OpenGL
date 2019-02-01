@@ -32,6 +32,7 @@ struct Mesh_Vertex {
 struct Mesh_Texture {
     unsigned int t_id;
     string type;
+    string path;
 };
 
 class Mesh {
