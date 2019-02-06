@@ -138,7 +138,6 @@ private:
                 textures.push_back(texture);
                 loadedTexture.push_back(texture);
             }
-            
         }
         return textures;
     }
